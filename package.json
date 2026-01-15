@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.36.7",
+    "@clerk/themes": "^2.4.47",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -36,6 +38,7 @@
     "unrs-resolver"
   ],
   "trustedDependencies": [
+    "@clerk/shared",
     "sharp",
     "unrs-resolver"
   ]
