@@ -1,0 +1,5 @@
+procs:
+  convex:
+    cmd: ["bunx", "convex", "dev"]
+  dev:
+    cmd: ["bun", "dev"]
