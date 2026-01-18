@@ -3,3 +3,5 @@ procs:
     cmd: ["bunx", "convex", "dev"]
   dev:
     cmd: ["bun", "dev"]
+  inngest:
+    shell: "npx --ignore-scripts=false inngest-cli@latest dev"

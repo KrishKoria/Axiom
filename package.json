@@ -7,22 +7,31 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "mprocs": "mprocs"
+    "mprocs": "mprocs",
+    "inngest:dev": "npx --ignore-scripts=false inngest-cli@latest dev"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^2.0.8",
+    "@ai-sdk/google": "^3.0.10",
+    "@ai-sdk/openai": "^3.0.12",
+    "@ai-sdk/react": "^3.0.41",
     "@clerk/nextjs": "^6.36.7",
     "@clerk/themes": "^2.4.47",
+    "@inngest/agent-kit": "^0.13.2",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "ai": "^6.0.39",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.31.4",
+    "inngest": "^3.49.3",
     "lucide-react": "^0.562.0",
     "next": "16.1.2",
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
