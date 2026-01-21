@@ -1,10 +1,36 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
-import { Globe, Github, Sparkles, ArrowRight, Command } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  Github,
+  Sparkles,
+  AlertCircleIcon,
+  Loader2Icon,
+  GlobeIcon,
+} from "lucide-react";
+import { cn, generateName, getTimeAgo } from "@/lib/utils";
 import { useEffect, useCallback } from "react";
+import FeaturedProject from "./featured-projects";
+import { Button } from "@/components/ui/button";
+import { ActionCard, KeyboardShortcut } from "./action-card";
+import { useCreateProject, useProjectsPartial } from "@/hooks/use-projects";
+import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
+import { Doc } from "../../../../convex/_generated/dataModel";
+
+export function getProjectIcon(project: Doc<"projects">) {
+  if (project.importStatus === "completed") {
+    return <Github className="size-5 text-muted-foreground" />;
+  }
+  if (project.importStatus === "failed") {
+    return <AlertCircleIcon className="size-5 text-red-500" />;
+  }
+  if (project.importStatus === "pending") {
+    return (
+      <Loader2Icon className="size-5 text-muted-foreground animate-spin" />
+    );
+  }
+  return <GlobeIcon className="size-5 text-muted-foreground" />;
+}
 
 function AxiomLogo() {
   return (
@@ -49,148 +75,38 @@ function AxiomLogo() {
   );
 }
 
-function KeyboardShortcut({ keys }: { keys: string[] }) {
-  return (
-    <div className="inline-flex items-center gap-1">
-      {keys.map((key, i) => (
-        <kbd
-          key={i}
-          className="inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-md bg-secondary/80 text-secondary-foreground text-xs font-medium font-mono"
-        >
-          {key === "cmd" ? <Command className="size-3.5" /> : key}
-        </kbd>
-      ))}
-    </div>
-  );
-}
+function ProjectRow({ project }: { project: Doc<"projects"> }) {
+  const timeAgo = getTimeAgo(project.updatedAt);
 
-function ActionCard({
-  icon: Icon,
-  title,
-  shortcut,
-  onClick,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  shortcut: string[];
-  onClick?: () => void;
-}) {
   return (
-    <button
-      onClick={onClick}
+    <Button
+      variant="ghost"
       className={cn(
-        "group relative flex flex-col items-start gap-5 p-5 rounded-xl",
-        "bg-card border border-border",
-        "hover:border-primary/50 hover:bg-card/80",
-        "transition-all duration-150 ease-out",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        "w-56",
-      )}
-    >
-      <div className="flex w-full items-center justify-between">
-        <Icon className="size-6 text-muted-foreground group-hover:text-foreground transition-colors" />
-        <KeyboardShortcut keys={shortcut} />
-      </div>
-      <span className="text-base font-medium">{title}</span>
-    </button>
-  );
-}
-
-function FeaturedProject({
-  name,
-  updatedAt,
-  isGithub,
-  onClick,
-}: {
-  name: string;
-  updatedAt: number;
-  isGithub?: boolean;
-  onClick?: () => void;
-}) {
-  const timeAgo = getTimeAgo(updatedAt);
-
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "group flex items-center justify-between w-full p-5 rounded-xl",
-        "bg-card border border-border",
-        "hover:border-primary/50 hover:bg-card/80",
-        "transition-all duration-150 ease-out",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-      )}
-    >
-      <div className="flex items-center gap-4">
-        {isGithub ? (
-          <Github className="size-5 text-muted-foreground" />
-        ) : (
-          <Globe className="size-5 text-muted-foreground" />
-        )}
-        <div className="flex flex-col items-start gap-1">
-          <span className="text-base font-medium">{name}</span>
-          <span className="text-sm text-muted-foreground">{timeAgo}</span>
-        </div>
-      </div>
-      <ArrowRight className="size-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
-    </button>
-  );
-}
-
-function ProjectRow({
-  name,
-  updatedAt,
-  isGithub,
-  onClick,
-}: {
-  name: string;
-  updatedAt: number;
-  isGithub?: boolean;
-  onClick?: () => void;
-}) {
-  const timeAgo = getTimeAgo(updatedAt);
-
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "group flex items-center justify-between w-full py-3 px-4 -mx-4 rounded-lg",
+        "group flex items-center justify-between w-full h-auto py-3 px-4 rounded-lg",
         "hover:bg-accent/50",
         "transition-colors duration-150",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       )}
+      asChild
     >
-      <div className="flex items-center gap-4">
-        {isGithub ? (
-          <Github className="size-5 text-muted-foreground" />
-        ) : (
-          <Globe className="size-5 text-muted-foreground" />
-        )}
-        <span className="text-base text-foreground/90">{name}</span>
-      </div>
-      <span className="text-sm text-muted-foreground tabular-nums font-mono">
-        {timeAgo}
-      </span>
-    </button>
+      <Link
+        href={`/projects/${project._id}`}
+        className="flex items-center gap-4"
+      >
+        <div className="flex items-center gap-4">
+          {getProjectIcon(project)}
+          <span className="text-base text-foreground/90">{project.name}</span>
+        </div>
+        <span className="text-sm text-muted-foreground tabular-nums font-mono">
+          {timeAgo}
+        </span>
+      </Link>
+    </Button>
   );
-}
-
-function getTimeAgo(timestamp: number): string {
-  const now = Date.now();
-  const diff = now - timestamp;
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  if (days === 1) return "1 day ago";
-  return `${days} days ago`;
 }
 
 export default function ProjectView() {
-  const projects = useQuery(api.projects.get);
-
+  const projects = useProjectsPartial(6);
+  const createProject = useCreateProject();
   // Sort projects by updatedAt (most recent first)
   const sortedProjects = projects
     ? [...projects].sort((a, b) => b.updatedAt - a.updatedAt)
@@ -201,9 +117,10 @@ export default function ProjectView() {
 
   // Keyboard shortcut handlers
   const handleNew = useCallback(() => {
-    console.log("New project");
-    // TODO: Implement new project action
-  }, []);
+    createProject({
+      name: generateName(),
+    });
+  }, [createProject]);
 
   const handleImport = useCallback(() => {
     console.log("Import project");
@@ -265,11 +182,7 @@ export default function ProjectView() {
         {featuredProject && (
           <div className="space-y-4">
             <h2 className="text-base text-muted-foreground">Last updated</h2>
-            <FeaturedProject
-              name={featuredProject.name}
-              updatedAt={featuredProject.updatedAt}
-              isGithub={!!featuredProject.exportRepoURL}
-            />
+            <FeaturedProject project={featuredProject} />
           </div>
         )}
 
@@ -290,12 +203,7 @@ export default function ProjectView() {
             </div>
             <div className="flex flex-col">
               {recentProjects.map((project) => (
-                <ProjectRow
-                  key={project._id}
-                  name={project.name}
-                  updatedAt={project.updatedAt}
-                  isGithub={!!project.exportRepoURL}
-                />
+                <ProjectRow key={project._id} project={project} />
               ))}
             </div>
           </div>
@@ -308,7 +216,7 @@ export default function ProjectView() {
               <Sparkles className="size-7 text-muted-foreground" />
             </div>
             <p className="text-base text-muted-foreground">
-              Loading projects...
+              <Spinner className="size-4 text-ring" />
             </p>
           </div>
         )}
