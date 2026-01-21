@@ -10,8 +10,8 @@ import { ClerkProvider, useAuth, UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ThemeProvider } from "./theme-provider";
-import UnAuthenticatedView from "./views/unauthenticated";
-import AuthLoadingView from "./views/authloading";
+import UnAuthenticatedView from "./views/auth/unauthenticated";
+import AuthLoadingView from "./views/auth/authloading";
 import { dark } from "@clerk/themes";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
