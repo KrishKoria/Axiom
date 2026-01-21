@@ -40,9 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-convex/_generated/
 
 *.log
 .github/
 .claude/
-.sisyphus/
+.omc/
