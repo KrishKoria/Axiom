@@ -10,6 +10,10 @@ export function useProjectsPartial(limit: number) {
   return useQuery(api.projects.getPartial, { limit });
 }
 
+export function useProject(projectId: Id<"projects">) {
+  return useQuery(api.projects.getById, { id: projectId });
+}
+
 export function useCreateProject() {
   return useMutation(api.projects.create).withOptimisticUpdate(
     (localStore, args) => {
@@ -46,3 +50,40 @@ export function useCreateProject() {
     },
   );
 }
+
+export const useRenameProject = (projectId: Id<"projects">) => {
+  return useMutation(api.projects.rename).withOptimisticUpdate(
+    (localStore, args) => {
+      const existingProject = localStore.getQuery(api.projects.getById, {
+        id: projectId,
+      });
+
+      if (existingProject !== undefined && existingProject !== null) {
+        localStore.setQuery(
+          api.projects.getById,
+          { id: projectId },
+          {
+            ...existingProject,
+            name: args.name,
+            // eslint-disable-next-line react-hooks/purity
+            updatedAt: Date.now(),
+          },
+        );
+      }
+
+      const existingProjects = localStore.getQuery(api.projects.get);
+
+      if (existingProjects !== undefined) {
+        localStore.setQuery(
+          api.projects.get,
+          {},
+          existingProjects.map((project) => {
+            return project._id === args.id
+              ? { ...project, name: args.name, updatedAt: Date.now() }
+              : project;
+          }),
+        );
+      }
+    },
+  );
+};
