@@ -24,7 +24,8 @@ export const getPartial = query({
     const identity = await verifyAuth(ctx);
     return await ctx.db
       .query("projects")
-      .withIndex("byOwner", (q) => q.eq("ownerId", identity.subject))
+      .withIndex("byOwnerUpdatedAt", (q) => q.eq("ownerId", identity.subject))
+      .order("desc")
       .take(limit);
   },
 });

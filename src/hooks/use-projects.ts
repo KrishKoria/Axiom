@@ -14,6 +14,10 @@ export function useCreateProject() {
   return useMutation(api.projects.create).withOptimisticUpdate(
     (localStore, args) => {
       const existingProjects = localStore.getQuery(api.projects.get);
+      const existingPartialProjects = localStore.getQuery(
+        api.projects.getPartial,
+        { limit: 6 },
+      );
       if (existingProjects !== undefined) {
         // eslint-disable-next-line react-hooks/purity
         const now = Date.now();
@@ -28,6 +32,16 @@ export function useCreateProject() {
           newProject,
           ...existingProjects,
         ]);
+        if (existingPartialProjects !== undefined) {
+          const nextPartial = [newProject, ...existingPartialProjects]
+            .sort((a, b) => b.updatedAt - a.updatedAt)
+            .slice(0, 6);
+          localStore.setQuery(
+            api.projects.getPartial,
+            { limit: 6 },
+            nextPartial,
+          );
+        }
       }
     },
   );
