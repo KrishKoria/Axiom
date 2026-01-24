@@ -143,7 +143,7 @@ function TerminalPanel() {
       <div className="flex-1 p-3 font-mono text-xs overflow-auto">
         <div className="text-muted-foreground">$ npm run dev</div>
         <div className="text-foreground mt-1">
-          <span className="text-green-500">▸</span> Ready on
+          <span className="text-success">▸</span> Ready on
           http://localhost:3000
         </div>
         <div className="text-muted-foreground mt-1 flex items-center gap-1">
@@ -215,7 +215,7 @@ function PreviewTabContent() {
         <div className="flex items-center gap-2">
           {/* URL Bar */}
           <div className="flex items-center gap-2 px-3 py-1.5 bg-background border border-border rounded-md min-w-64">
-            <div className="size-2 rounded-full bg-green-500" />
+            <div className="size-2 rounded-full bg-success" />
             <span className="text-xs text-muted-foreground font-mono">
               localhost:3000
             </span>

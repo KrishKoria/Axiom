@@ -33,8 +33,10 @@
 ### Semantic
 
 - Destructive: `oklch(0.69 0.21 15)` — Error states
-- Success: Green (not yet defined)
+- Success: `oklch(0.72 0.17 142)` (light) / `oklch(0.75 0.15 142)` (dark) — Success states, online indicators
 - Warning: Amber (not yet defined)
+
+> **Note:** Use `text-destructive` and `text-success` tokens instead of hardcoded colors like `text-red-500` or `text-green-500`.
 
 ---
 
@@ -67,11 +69,16 @@ Base unit: 4px
 | Token | Value | Use             |
 | ----- | ----- | --------------- |
 | 1     | 4px   | Micro gaps      |
+| 1.5   | 6px   | Fine adjustments (py-1.5, gap-1.5) |
 | 2     | 8px   | Tight spacing   |
+| 2.5   | 10px  | Icon containers (size-2.5) |
 | 3     | 12px  | Default gap     |
 | 4     | 16px  | Section padding |
+| 5     | 20px  | Card padding    |
 | 6     | 24px  | Large gaps      |
 | 8     | 32px  | Section margins |
+
+> **Note:** While 4px is the base unit, 6px (1.5) and 10px (2.5) are acceptable for fine-tuning vertical rhythm and icon sizing.
 
 ---
 
@@ -128,12 +135,50 @@ box-shadow: 0 0 12px 2px var(--ai-glow);
 - AI-colored focus ring for chat input
 - Auto-resize for textarea
 
+```tsx
+className={cn(
+  "w-full resize-none rounded-lg border border-input bg-background px-4 py-3",
+  "text-sm placeholder:text-muted-foreground",
+  "focus:outline-none focus:ring-2 focus:ring-ai/50 focus:border-ai/50",
+  "transition-all duration-200"
+)}
+```
+
 ### Buttons
 
 - Primary: Filled with primary color
 - Ghost: Transparent, hover shows accent
 - Outline: Border with transparent background (used for secondary actions like Export)
 - AI actions: Cyan background
+
+**Sizes:**
+- `sm`: `h-8` or `size-8 p-0` for icon buttons
+- `default`: Standard padding
+
+### Cards
+
+```
+p-5 rounded-xl border border-border shadow-sm
+hover:shadow-md transition-shadow (for interactive cards)
+```
+
+- Default padding: 20px (p-5)
+- Border radius: rounded-xl (12px)
+- Always use `border-border` token
+- Add hover shadow for clickable cards
+
+### Keyboard Shortcuts
+
+```tsx
+<kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono">
+  Ctrl+K
+</kbd>
+```
+
+- Background: `bg-muted`
+- Text: 10px monospace
+- Padding: 6px horizontal, 2px vertical
+- Border radius: default rounded
 
 ### Panel Tabs
 
