@@ -29,6 +29,10 @@
     --chart-3: oklch(0.5679 0.2113 276.7065);
     --chart-4: oklch(0.6356 0.1922 281.8054);
     --chart-5: oklch(0.4509 0.1758 279.3838);
+    --ai: oklch(0.7 0.15 195);
+    --ai-foreground: oklch(0.15 0.02 195);
+    --ai-glow: oklch(0.7 0.15 195 / 0.3);
+    --ai-glow-strong: oklch(0.7 0.15 195 / 0.5);
     --sidebar: oklch(0.958 0.0133 286.1454);
     --sidebar-foreground: oklch(0.3015 0.0572 282.4176);
     --sidebar-primary: oklch(0.5417 0.179 288.0332);
@@ -66,6 +70,10 @@
     --chart-3: oklch(0.7482 0.1235 244.7492);
     --chart-4: oklch(0.7124 0.0977 186.6761);
     --chart-5: oklch(0.7546 0.1831 346.8124);
+    --ai: oklch(0.75 0.12 195);
+    --ai-foreground: oklch(0.95 0.02 195);
+    --ai-glow: oklch(0.75 0.12 195 / 0.25);
+    --ai-glow-strong: oklch(0.75 0.12 195 / 0.4);
     --sidebar: oklch(0.2284 0.0384 282.9324);
     --sidebar-foreground: oklch(0.9185 0.0257 285.8834);
     --sidebar-primary: oklch(0.7162 0.1597 290.3962);
@@ -118,6 +126,10 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-ai: var(--ai);
+  --color-ai-foreground: var(--ai-foreground);
+  --color-ai-glow: var(--ai-glow);
+  --color-ai-glow-strong: var(--ai-glow-strong);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -159,6 +171,8 @@
 @theme inline {
   --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1
     var(--delay, 0ms);
+  --animate-ai-pulse: ai-pulse 2s ease-in-out infinite;
+  --animate-ai-thinking: ai-thinking 1.5s ease-in-out infinite;
 
   @keyframes cell-ripple {
     0% {
@@ -169,6 +183,26 @@
     }
     100% {
       opacity: 0.4;
+    }
+  }
+
+  @keyframes ai-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 var(--ai-glow);
+    }
+    50% {
+      box-shadow: 0 0 12px 2px var(--ai-glow);
+    }
+  }
+
+  @keyframes ai-thinking {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
     }
   }
 }
@@ -184,3 +218,36 @@
 ::-webkit-scrollbar-thumb {
   @apply rounded-full bg-border border border-transparent border-solid bg-clip-padding;
 }
+
+/* Allotment gutter - the "living seam" */
+.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1 {
+  background: transparent !important;
+  transition: background 0.2s ease;
+}
+
+.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: var(--border);
+  transition: all 0.2s ease;
+}
+
+.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1:hover::before,
+.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1.allotment-module_active__mstRE::before {
+  width: 3px;
+  background: var(--ai);
+  box-shadow: 0 0 12px 2px var(--ai-glow);
+}
+
+/* AI thinking state for gutter */
+.gutter-thinking .allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1::before {
+  background: var(--ai);
+  box-shadow: 0 0 12px 2px var(--ai-glow);
+  animation: ai-pulse 2s ease-in-out infinite;
+}
+
