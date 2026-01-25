@@ -8,7 +8,6 @@ import { Id } from "../../convex/_generated/dataModel";
 import { Navbar } from "./navbar";
 import { ConversationPanel } from "./editor/conversation-panel";
 import { CodePanel } from "./editor/code-panel";
-import { useProject } from "@/hooks/use-projects";
 import { cn } from "@/lib/utils";
 
 const MIN_SIDEBAR_WIDTH = 280;
@@ -23,10 +22,10 @@ export const ProjectLayout = ({
   children: React.ReactNode;
   projectId: Id<"projects">;
 }) => {
-  const project = useProject(projectId);
   const [isThinking, setIsThinking] = useState(false);
 
   const handleSend = (message: string) => {
+    void message;
     // Simulate AI thinking
     setIsThinking(true);
     setTimeout(() => {
@@ -35,7 +34,12 @@ export const ProjectLayout = ({
   };
 
   return (
-    <div className={cn("w-full h-screen flex flex-col", isThinking && "gutter-thinking")}>
+    <div
+      className={cn(
+        "w-full h-screen flex flex-col",
+        isThinking && "gutter-thinking",
+      )}
+    >
       <Navbar projectId={projectId} />
       <div className="flex-1 flex overflow-hidden">
         <Allotment
@@ -51,7 +55,7 @@ export const ProjectLayout = ({
             <ConversationPanel isThinking={isThinking} onSend={handleSend} />
           </Allotment.Pane>
           <Allotment.Pane>
-            <CodePanel projectName={project?.name} />
+            <CodePanel projectId={projectId} />
           </Allotment.Pane>
         </Allotment>
       </div>

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Allotment } from "allotment";
 import {
   FileIcon,
-  FolderIcon,
-  ChevronRightIcon,
   PlusIcon,
   TerminalIcon,
   CodeIcon,
@@ -18,53 +17,19 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { FileTreeSidebar } from "./file-explorer";
+import { Id } from "../../../convex/_generated/dataModel";
+
+const MIN_FILE_TREE_WIDTH = 160;
+const MAX_FILE_TREE_WIDTH = 400;
+const DEFAULT_FILE_TREE_WIDTH = 224;
 
 interface CodePanelProps {
-  projectName?: string;
+  projectId: Id<"projects">;
 }
 
 type PanelTab = "code" | "preview";
 type PreviewDevice = "desktop" | "tablet" | "mobile";
-
-function FileTreeItem({
-  name,
-  isFolder = false,
-  isActive = false,
-  depth = 0,
-  isOpen = false,
-}: {
-  name: string;
-  isFolder?: boolean;
-  isActive?: boolean;
-  depth?: number;
-  isOpen?: boolean;
-}) {
-  return (
-    <button
-      className={cn(
-        "w-full flex items-center gap-1.5 px-2 py-1 text-sm text-left",
-        "hover:bg-accent/50 transition-colors rounded-sm",
-        isActive && "bg-accent text-accent-foreground",
-      )}
-      style={{ paddingLeft: `${8 + depth * 12}px` }}
-    >
-      {isFolder && (
-        <ChevronRightIcon
-          className={cn(
-            "size-3.5 text-muted-foreground transition-transform",
-            isOpen && "rotate-90",
-          )}
-        />
-      )}
-      {isFolder ? (
-        <FolderIcon className="size-4 text-muted-foreground" />
-      ) : (
-        <FileIcon className="size-4 text-muted-foreground" />
-      )}
-      <span className="truncate">{name}</span>
-    </button>
-  );
-}
 
 function EditorTabs() {
   return (
@@ -143,8 +108,7 @@ function TerminalPanel() {
       <div className="flex-1 p-3 font-mono text-xs overflow-auto">
         <div className="text-muted-foreground">$ npm run dev</div>
         <div className="text-foreground mt-1">
-          <span className="text-success">▸</span> Ready on
-          http://localhost:3000
+          <span className="text-success">▸</span> Ready on http://localhost:3000
         </div>
         <div className="text-muted-foreground mt-1 flex items-center gap-1">
           <span className="animate-pulse">█</span>
@@ -154,42 +118,27 @@ function TerminalPanel() {
   );
 }
 
-function FileTreeSidebar({ projectName }: { projectName: string }) {
+function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
   return (
-    <div className="w-56 shrink-0 border-r border-border bg-sidebar flex flex-col">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-sidebar-border">
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Explorer
-        </span>
-        <Button variant="ghost" size="sm" className="size-6 p-0">
-          <PlusIcon className="size-3.5" />
-        </Button>
-      </div>
-      <div className="flex-1 overflow-y-auto py-1">
-        <FileTreeItem name={projectName} isFolder isOpen depth={0} />
-        <FileTreeItem name="src" isFolder isOpen depth={1} />
-        <FileTreeItem name="index.tsx" isActive depth={2} />
-        <FileTreeItem name="App.tsx" depth={2} />
-        <FileTreeItem name="styles.css" depth={2} />
-        <FileTreeItem name="components" isFolder depth={1} />
-        <FileTreeItem name="public" isFolder depth={1} />
-        <FileTreeItem name="package.json" depth={1} />
-        <FileTreeItem name="tsconfig.json" depth={1} />
-      </div>
-    </div>
-  );
-}
-
-function CodeTabContent({ projectName }: { projectName: string }) {
-  return (
-    <div className="flex h-full">
-      <FileTreeSidebar projectName={projectName} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <EditorTabs />
-        <CodeEditor />
-        <TerminalPanel />
-      </div>
-    </div>
+    <Allotment className="h-full">
+      <Allotment.Pane
+        minSize={MIN_FILE_TREE_WIDTH}
+        maxSize={MAX_FILE_TREE_WIDTH}
+        preferredSize={DEFAULT_FILE_TREE_WIDTH}
+        className="min-w-0"
+      >
+        <div className="h-full min-w-0">
+          <FileTreeSidebar projectId={projectId} />
+        </div>
+      </Allotment.Pane>
+      <Allotment.Pane>
+        <div className="h-full flex flex-col min-w-0">
+          <EditorTabs />
+          <CodeEditor />
+          <TerminalPanel />
+        </div>
+      </Allotment.Pane>
+    </Allotment>
   );
 }
 
@@ -357,7 +306,7 @@ function PanelTabs({
   );
 }
 
-export function CodePanel({ projectName = "my-project" }: CodePanelProps) {
+export function CodePanel({ projectId }: CodePanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>("code");
 
   return (
@@ -365,7 +314,7 @@ export function CodePanel({ projectName = "my-project" }: CodePanelProps) {
       <PanelTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex-1 min-h-0">
         {activeTab === "code" ? (
-          <CodeTabContent projectName={projectName} />
+          <CodeTabContent projectId={projectId} />
         ) : (
           <PreviewTabContent />
         )}
