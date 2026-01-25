@@ -28,7 +28,7 @@ export const RenameInput = ({
 
   return (
     <div
-      className="w-full flex items-center gap-1 h-5.5 bg-accent/30"
+      className="w-full flex items-center gap-1 h-6 bg-accent/30"
       style={{ paddingLeft: getItemPadding(depth, type === "file") }}
     >
       <div className="flex items-center gap-0.5">

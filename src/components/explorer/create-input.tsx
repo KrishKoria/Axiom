@@ -46,7 +46,7 @@ export const CreateInput = ({
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="flex-1 bg-transparent text-sm outline-none focus:ring-1 focus:ring-inset focus:ring-ring"
+        className="flex-1 bg-transparent text-sm outline-none transition-colors duration-150 focus:ring-2 focus:ring-primary/50 focus:bg-accent/10"
         onBlur={handleSubmit}
         onKeyDown={(e) => {
           if (e.key === "Enter") {

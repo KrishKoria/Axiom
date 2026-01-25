@@ -109,7 +109,7 @@ export const FileTreeItem = ({
       <div className="flex items-center gap-0.5">
         <ChevronRightIcon
           className={cn(
-            "size-4 shrink-0 text-muted-foreground",
+            "size-4 shrink-0 text-muted-foreground transition-transform duration-150",
             isOpen && "rotate-90",
           )}
         />
@@ -124,7 +124,7 @@ export const FileTreeItem = ({
       <>
         <button
           onClick={() => setIsOpen((value) => !value)}
-          className="group flex items-center gap-1 h-6 hover:bg-accent/30 w-full"
+          className="group flex items-center gap-1 h-6 hover:bg-accent/40 w-full transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:bg-accent/20"
           style={{ paddingLeft: getItemPadding(depth, false) }}
         >
           {folderRender}

@@ -47,8 +47,9 @@ export const FileTreeItemWrapper = ({
             }
           }}
           className={cn(
-            "group flex items-center gap-1 w-full h-6 hover:bg-accent/30 outline-none focus:ring-1 focus:ring-inset focus:ring-ring",
-            isActive && "bg-accent/30",
+            "group flex items-center gap-1 w-full h-6 hover:bg-accent/40 outline-none transition-colors duration-150",
+            "focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:bg-accent/20",
+            isActive && "bg-accent/30 border-l-2 border-primary",
           )}
           style={{ paddingLeft: getItemPadding(depth, item.type === "file") }}
         >

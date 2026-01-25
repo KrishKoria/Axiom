@@ -12,10 +12,14 @@ export const LoadingRow = ({
 }) => {
   return (
     <div
-      className={cn("h-6 flex items-center text-muted-foreground", className)}
+      className={cn(
+        "h-6 flex items-center text-muted-foreground",
+        "animate-pulse",
+        className
+      )}
       style={{ paddingLeft: getItemPadding(depth, true) }}
     >
-      <Spinner className="size-4 text-ring ml-0.5" />
+      <Spinner className="size-4 text-muted-foreground ml-0.5" />
     </div>
   );
 };

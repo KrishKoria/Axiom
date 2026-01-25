@@ -217,6 +217,62 @@ Segmented control for responsive preview.
 - Hover/Active: 3px cyan with glow
 - AI Thinking: Pulsing cyan glow animation
 
+### File Explorer
+
+**Header row:**
+
+```tsx
+// Explorer header with hover-visible actions
+<div className="group shrink-0 flex items-center justify-between px-3 py-2 border-b border-sidebar-border">
+  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+    Explorer
+  </span>
+  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+    {/* New File / New Folder buttons */}
+  </div>
+</div>
+```
+
+**Tree item wrapper:**
+
+```tsx
+className={cn(
+  // Base: full width, fixed height, smooth transitions
+  "group flex items-center gap-1 w-full h-6 transition-colors duration-150",
+  // Hover: slightly visible accent background
+  "hover:bg-accent/40",
+  // Focus: violet ring with subtle background
+  "focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:bg-accent/20",
+  // Active/selected: background + left border indicator
+  isActive && "bg-accent/30 border-l-2 border-primary",
+)}
+```
+
+**Project row:**
+- Use `font-semibold` on project name for visual hierarchy
+- Chevron with `transition-transform duration-150` for smooth expand/collapse
+
+**Create/Rename input:**
+
+```tsx
+className="flex-1 bg-transparent text-sm outline-none transition-colors duration-150 focus:ring-2 focus:ring-primary/50 focus:bg-accent/10"
+```
+
+**Loading state:**
+- Match `h-6` height of regular items
+- Use `animate-pulse` for subtle loading indication
+- Spinner with `text-muted-foreground`
+
+**Action buttons (hover-visible):**
+
+```tsx
+<div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+  <Button variant="highlight" className="size-5 flex items-center justify-center rounded hover:bg-accent">
+    <FilePlus2Icon className="size-3.5 text-muted-foreground" />
+  </Button>
+</div>
+```
+
 ---
 
 ## Animation
