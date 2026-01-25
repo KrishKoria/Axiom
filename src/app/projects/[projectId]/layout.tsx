@@ -6,12 +6,8 @@ export default async function ProjectPageLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ projectId: string }>;
+  params: Promise<{ projectId: Id<"projects"> }>;
 }>) {
   const { projectId } = await params;
-  return (
-    <ProjectLayout projectId={projectId as unknown as Id<"projects">}>
-      {children}
-    </ProjectLayout>
-  );
+  return <ProjectLayout projectId={projectId}>{children}</ProjectLayout>;
 }
