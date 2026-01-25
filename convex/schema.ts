@@ -25,4 +25,16 @@ export default defineSchema({
   })
     .index("byOwner", ["ownerId"])
     .index("byOwnerUpdatedAt", ["ownerId", "updatedAt"]),
+  files: defineTable({
+    projectId: v.id("projects"),
+    parentId: v.optional(v.id("files")),
+    name: v.string(),
+    type: v.union(v.literal("file"), v.literal("folder")),
+    content: v.optional(v.string()),
+    storageId: v.optional(v.id("_storage")),
+    updatedAt: v.number(),
+  })
+    .index("byProject", ["projectId"])
+    .index("byParent", ["parentId"])
+    .index("byProjectParent", ["projectId", "parentId"]),
 });
