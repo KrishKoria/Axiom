@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Id } from "../../convex/_generated/dataModel";
 import { api } from "../../convex/_generated/api";
 
@@ -71,6 +71,75 @@ export const useCreateFolder = () => {
           api.files.getFolderContents,
           { projectId: args.projectId, parentId: args.parentId },
           sortFiles([...existingFiles, newFolder]),
+        );
+      }
+    },
+  );
+};
+
+export const useFolderContents = ({
+  projectId,
+  parentId,
+  enabled = true,
+}: {
+  projectId: Id<"projects">;
+  parentId?: Id<"files">;
+  enabled?: boolean;
+}) => {
+  return useQuery(
+    api.files.getFolderContents,
+    enabled ? { projectId, parentId } : "skip",
+  );
+};
+
+export const useRenameFile = ({
+  projectId,
+  parentId,
+}: {
+  projectId: Id<"projects">;
+  parentId?: Id<"files">;
+}) => {
+  return useMutation(api.files.renameFile).withOptimisticUpdate(
+    (localStore, args) => {
+      const existingFiles = localStore.getQuery(api.files.getFolderContents, {
+        projectId,
+        parentId,
+      });
+
+      if (existingFiles !== undefined) {
+        const updatedFiles = existingFiles.map((file) =>
+          file._id === args.fileId ? { ...file, name: args.newName } : file,
+        );
+
+        localStore.setQuery(
+          api.files.getFolderContents,
+          { projectId, parentId },
+          sortFiles(updatedFiles),
+        );
+      }
+    },
+  );
+};
+
+export const useDeleteFile = ({
+  projectId,
+  parentId,
+}: {
+  projectId: Id<"projects">;
+  parentId?: Id<"files">;
+}) => {
+  return useMutation(api.files.deleteFile).withOptimisticUpdate(
+    (localStore, args) => {
+      const existingFiles = localStore.getQuery(api.files.getFolderContents, {
+        projectId,
+        parentId,
+      });
+
+      if (existingFiles !== undefined) {
+        localStore.setQuery(
+          api.files.getFolderContents,
+          { projectId, parentId },
+          existingFiles.filter((file) => file._id !== args.fileId),
         );
       }
     },

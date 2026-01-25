@@ -7,8 +7,14 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Button } from "../ui/button";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useProject } from "@/hooks/use-projects";
-import { useCreateFile, useCreateFolder } from "@/hooks/use-files";
+import {
+  useCreateFile,
+  useCreateFolder,
+  useFolderContents,
+} from "@/hooks/use-files";
 import { CreateInput } from "./create-input";
+import { LoadingRow } from "./loading-row";
+import { FileTreeItem } from "./FileTreeItem";
 
 export function FileTreeSidebar({ projectId }: { projectId: Id<"projects"> }) {
   return (
@@ -30,9 +36,14 @@ export function FileTreeSidebar({ projectId }: { projectId: Id<"projects"> }) {
 function FileTree({ projectId }: { projectId: Id<"projects"> }) {
   const [isOpen, setIsOpen] = useState(true);
   const project = useProject(projectId);
+  const rootfiles = useFolderContents({
+    projectId,
+    enabled: isOpen,
+  });
   const createFile = useCreateFile();
   const createFolder = useCreateFolder();
   const [creating, setCreating] = useState<"file" | "folder" | null>(null);
+
   const handleCreate = (name: string) => {
     setCreating(null);
     if (creating === "file") {
@@ -101,6 +112,7 @@ function FileTree({ projectId }: { projectId: Id<"projects"> }) {
       </div>
       {isOpen && (
         <>
+          {rootfiles === undefined && <LoadingRow depth={0} />}
           {creating && (
             <CreateInput
               type={creating}
@@ -109,6 +121,14 @@ function FileTree({ projectId }: { projectId: Id<"projects"> }) {
               onCancel={() => setCreating(null)}
             />
           )}
+          {rootfiles?.map((item) => (
+            <FileTreeItem
+              key={item._id}
+              item={item}
+              projectId={projectId}
+              depth={0}
+            />
+          ))}
         </>
       )}
     </>

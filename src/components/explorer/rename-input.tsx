@@ -2,37 +2,43 @@ import { useState } from "react";
 import { ChevronRightIcon } from "lucide-react";
 import { FileIcon, FolderIcon } from "@react-symbols/icons/utils";
 import { getItemPadding } from "./constants";
+import { cn } from "@/lib/utils";
 
-export const CreateInput = ({
+export const RenameInput = ({
   type,
+  defaultValue,
+  isOpen,
   depth,
   onSubmit,
   onCancel,
 }: {
   type: "file" | "folder";
+  defaultValue: string;
+  isOpen?: boolean;
   depth: number;
   onSubmit: (name: string) => void;
   onCancel: () => void;
 }) => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultValue);
 
   const handleSubmit = () => {
-    const trimmedValue = value.trim();
-    if (trimmedValue) {
-      onSubmit(trimmedValue);
-    } else {
-      onCancel();
-    }
+    const trimmedValue = value.trim() || defaultValue;
+    onSubmit(trimmedValue);
   };
 
   return (
     <div
-      className="w-full flex items-center gap-1 h-6 bg-accent/30"
+      className="w-full flex items-center gap-1 h-5.5 bg-accent/30"
       style={{ paddingLeft: getItemPadding(depth, type === "file") }}
     >
       <div className="flex items-center gap-0.5">
         {type === "folder" && (
-          <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" />
+          <ChevronRightIcon
+            className={cn(
+              "size-4 shrink-0 text-muted-foreground",
+              isOpen && "rotate-90",
+            )}
+          />
         )}
         {type === "file" && (
           <FileIcon fileName={value} autoAssign className="size-4" />
@@ -54,6 +60,19 @@ export const CreateInput = ({
           }
           if (e.key === "Escape") {
             onCancel();
+          }
+        }}
+        onFocus={(e) => {
+          if (type === "folder") {
+            e.currentTarget.select();
+          } else {
+            const value = e.currentTarget.value;
+            const lastDotIndex = value.lastIndexOf(".");
+            if (lastDotIndex > 0) {
+              e.currentTarget.setSelectionRange(0, lastDotIndex);
+            } else {
+              e.currentTarget.select();
+            }
           }
         }}
       />

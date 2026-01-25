@@ -228,7 +228,7 @@ function PreviewTabContent() {
       <div className="flex-1 flex items-start justify-center p-4 bg-muted/20 overflow-auto">
         <div
           className={cn(
-            "bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300",
+            "bg-card rounded-lg shadow-lg overflow-hidden transition-all duration-300",
             device !== "desktop" && "border border-border",
           )}
           style={{
@@ -240,11 +240,11 @@ function PreviewTabContent() {
         >
           {/* Mock Preview Content */}
           <div className="p-8 text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl font-bold text-foreground mb-4">
               Hello, Axiom!
             </h1>
-            <p className="text-gray-600 mb-4">Count: 0</p>
-            <button className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors">
+            <p className="text-muted-foreground mb-4">Count: 0</p>
+            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
               Increment
             </button>
           </div>

@@ -7,9 +7,9 @@ export function KeyboardShortcut({ keys }: { keys: string[] }) {
       {keys.map((key, i) => (
         <kbd
           key={i}
-          className="inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-md bg-secondary/80 text-secondary-foreground text-xs font-medium font-mono"
+          className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono"
         >
-          {key === "cmd" ? <Command className="size-3.5" /> : key}
+          {key === "cmd" ? <Command className="size-3" /> : key}
         </kbd>
       ))}
     </div>
