@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { FileTreeSidebar } from "./file-explorer";
+import { FileTreeSidebar } from "../explorer/file-explorer";
 import { Id } from "../../../convex/_generated/dataModel";
 
 const MIN_FILE_TREE_WIDTH = 160;
