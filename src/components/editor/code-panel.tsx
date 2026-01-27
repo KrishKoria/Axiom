@@ -9,6 +9,8 @@ import { FileTreeSidebar } from "../explorer/file-explorer";
 import { Id } from "../../../convex/_generated/dataModel";
 import PreviewTabContent from "./preview-tab";
 import EditorTabs from "./editor-tabs";
+import { useEditor } from "@/hooks/use-editor";
+import FileBreadCrumbs from "./file-bread-crumbs";
 
 const MIN_FILE_TREE_WIDTH = 160;
 const MAX_FILE_TREE_WIDTH = 400;
@@ -87,6 +89,7 @@ function TerminalPanel() {
 }
 
 function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
+  const { activeTabId } = useEditor(projectId);
   return (
     <Allotment className="h-full">
       <Allotment.Pane
@@ -102,8 +105,9 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
       <Allotment.Pane>
         <div className="h-full flex flex-col min-w-0">
           <EditorTabs projectId={projectId} />
-          <CodeEditor />
-          <TerminalPanel />
+          {activeTabId && <FileBreadCrumbs fileId={activeTabId} />}
+          {activeTabId ? <CodeEditor /> : null}
+          {/* <TerminalPanel /> */}
         </div>
       </Allotment.Pane>
     </Allotment>
