@@ -196,6 +196,89 @@ Top-level navigation within the code panel.
 - Tabs aligned left, actions aligned right with flex spacer
 - `rounded-none` on tab buttons for clean edge alignment
 
+### Editor Tabs (File Tabs)
+
+Tab bar for open files in the code editor.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ [📄 index.tsx •×] [📄 styles.css] [+]                       │
+│  ↑ active + modified  ↑ inactive    ↑ new tab              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Container:**
+
+```tsx
+className="flex items-center gap-0 border-b border-border bg-muted/30 overflow-x-auto"
+```
+
+**Active tab:**
+
+```tsx
+className={cn(
+  "group flex items-center gap-1 px-3 py-1.5 text-sm",
+  "border-r border-border bg-background",
+)}
+```
+
+- Elevated with `bg-background` against `bg-muted/30` container
+- Right border separates from adjacent tabs
+- Close button always visible
+
+**Inactive tab:**
+
+```tsx
+className={cn(
+  "group flex items-center gap-1 px-3 py-1.5 text-sm",
+  "text-muted-foreground hover:bg-accent/50 transition-colors",
+)}
+```
+
+- Muted text, no background
+- Close button visible on hover only (smart visibility)
+
+**Close button:**
+
+```tsx
+<button
+  className={cn(
+    "ml-1 size-4 flex items-center justify-center rounded hover:bg-accent",
+    !isActive && "opacity-0 group-hover:opacity-100 transition-opacity",
+  )}
+>
+  <XIcon className="size-3 text-muted-foreground" />
+</button>
+```
+
+**Modified indicator:**
+
+```tsx
+// Show dot before close button when file has unsaved changes
+{isModified && (
+  <span className="size-1.5 rounded-full bg-primary" />
+)}
+```
+
+- Small violet dot indicates unsaved changes
+- Positioned before the close button
+- Uses `bg-primary` to match brand color
+
+**New tab button:**
+
+```tsx
+<button className="ml-1 px-2 py-1.5 hover:bg-accent/50 transition-colors">
+  <PlusIcon className="size-4 text-muted-foreground" />
+</button>
+```
+
+**File icons:**
+- Size: `size-3.5`
+- Color: `text-muted-foreground`
+- Use file-type specific icons when available
+
+---
+
 ### Device Switcher (Preview)
 
 Segmented control for responsive preview.

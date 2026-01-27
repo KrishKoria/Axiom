@@ -6,7 +6,7 @@ import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import { Id } from "../../convex/_generated/dataModel";
 import { Navbar } from "./navbar";
-import { ConversationPanel } from "./editor/conversation-panel";
+import { ConversationPanel } from "./conversation-panel/conversation-panel";
 import { CodePanel } from "./editor/code-panel";
 import { cn } from "@/lib/utils";
 

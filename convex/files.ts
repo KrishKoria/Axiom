@@ -80,11 +80,11 @@ export const getFolderContents = query({
 
 export const getFilePath = query({
   args: {
-    id: v.id("files"),
+    fileId: v.id("files"),
   },
   handler: async (ctx, args) => {
     const identity = await verifyAuth(ctx);
-    const file = await ctx.db.get("files", args.id);
+    const file = await ctx.db.get("files", args.fileId);
     if (!file) {
       throw new Error("File not found");
     }
@@ -96,7 +96,7 @@ export const getFilePath = query({
       throw new Error("Unauthorized access");
     }
     const path: { _id: string; name: string }[] = [];
-    let currentId: Id<"files"> | undefined = args.id;
+    let currentId: Id<"files"> | undefined = args.fileId;
     while (currentId) {
       const currentFile = (await ctx.db.get("files", currentId)) as
         | Doc<"files">
