@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import verifyAuth from "./auth";
-import { Id } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 
 export const getFiles = query({
   args: {
@@ -75,6 +75,37 @@ export const getFolderContents = query({
       }
       return a.type === "folder" ? -1 : 1;
     });
+  },
+});
+
+export const getFilePath = query({
+  args: {
+    id: v.id("files"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await verifyAuth(ctx);
+    const file = await ctx.db.get("files", args.id);
+    if (!file) {
+      throw new Error("File not found");
+    }
+    const project = await ctx.db.get("projects", file.projectId);
+    if (!project) {
+      throw new Error("Project not found");
+    }
+    if (project.ownerId !== identity.subject) {
+      throw new Error("Unauthorized access");
+    }
+    const path: { _id: string; name: string }[] = [];
+    let currentId: Id<"files"> | undefined = args.id;
+    while (currentId) {
+      const currentFile = (await ctx.db.get("files", currentId)) as
+        | Doc<"files">
+        | undefined;
+      if (!currentFile) break;
+      path.unshift({ _id: currentFile._id, name: currentFile.name });
+      currentId = currentFile.parentId;
+    }
+    return path;
   },
 });
 

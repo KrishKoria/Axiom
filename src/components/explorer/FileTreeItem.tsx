@@ -18,6 +18,7 @@ import {
 } from "@/hooks/use-files";
 import { FileTreeItemWrapper } from "./file-tree-item-wrapper";
 import { RenameInput } from "./rename-input";
+import { useEditor } from "@/hooks/use-editor";
 
 export const FileTreeItem = ({
   item,
@@ -42,6 +43,7 @@ export const FileTreeItem = ({
   const createFile = useCreateFile();
   const createFolder = useCreateFolder();
 
+  const { openFile, closeTab, activeTabId } = useEditor(projectId);
   const folderContents = useFolderContents({
     projectId,
     parentId: item._id,
@@ -83,16 +85,28 @@ export const FileTreeItem = ({
 
   if (item.type === "file") {
     const fileName = item.name;
-
+    const isActive = activeTabId === item._id;
+    if (isRenaming) {
+      return (
+        <RenameInput
+          type="file"
+          defaultValue={fileName}
+          depth={depth}
+          onSubmit={handleRename}
+          onCancel={() => setIsRenaming(false)}
+        />
+      );
+    }
     return (
       <FileTreeItemWrapper
         item={item}
         depth={depth}
-        isActive={isOpen}
-        onClick={() => {}}
-        onDoubleClick={() => {}}
+        isActive={isActive}
+        onClick={() => openFile(item._id, { pinned: false })}
+        onDoubleClick={() => openFile(item._id, { pinned: true })}
         onRename={() => setIsRenaming(true)}
         onDelete={() => {
+          closeTab(item._id);
           deleteFile({ fileId: item._id });
         }}
       >
