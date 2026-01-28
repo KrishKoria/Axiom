@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Allotment } from "allotment";
 import { TerminalIcon, CodeIcon, PlayIcon, GithubIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -56,6 +56,14 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
   const fileUrl = useFileUrl(activeFile?.storageId);
   const isActiveFileBinary = activeFile && activeFile.storageId;
   const isActiveFileText = activeFile && !activeFile.storageId;
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [activeTabId]);
   return (
     <Allotment className="h-full">
       <Allotment.Pane
@@ -101,10 +109,7 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
             </div>
           )}
           {isActiveFileBinary && activeFile && (
-            <BinaryFilePreview
-              filename={activeFile.name}
-              url={fileUrl}
-            />
+            <BinaryFilePreview filename={activeFile.name} url={fileUrl} />
           )}
           {/* <TerminalPanel /> */}
         </div>
