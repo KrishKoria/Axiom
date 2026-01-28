@@ -153,3 +153,7 @@ export const useFile = (fileId: Id<"files"> | null) => {
 export const useFilePath = (fileId: Id<"files"> | null) => {
   return useQuery(api.files.getFilePath, fileId ? { fileId } : "skip");
 };
+
+export const useUpdateFileContent = () => {
+  return useMutation(api.files.updateFileContent);
+};

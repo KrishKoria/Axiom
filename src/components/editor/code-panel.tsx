@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Allotment } from "allotment";
 import { TerminalIcon, CodeIcon, PlayIcon, GithubIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,7 @@ import PreviewTabContent from "./preview-tab";
 import EditorTabs from "./editor-tabs";
 import { useEditor } from "@/hooks/use-editor";
 import { FileBreadCrumbs } from "./file-bread-crumbs";
-import { useFile } from "@/hooks/use-files";
+import { useFile, useUpdateFileContent } from "@/hooks/use-files";
 import Image from "next/image";
 import CodeEditor from "./code-editor";
 
@@ -50,6 +50,10 @@ function TerminalPanel() {
 function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
   const { activeTabId } = useEditor(projectId);
   const activeFile = useFile(activeTabId);
+  const updateFileContent = useUpdateFileContent();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isActiveFileBinary = activeFile && activeFile.storageId;
+  const isActiveFileText = activeFile && !activeFile.storageId;
   return (
     <Allotment className="h-full">
       <Allotment.Pane
@@ -66,13 +70,40 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
         <div className="h-full flex flex-col min-w-0">
           <EditorTabs projectId={projectId} />
           {activeTabId && <FileBreadCrumbs projectId={projectId} />}
-          {activeFile ? (
-            <CodeEditor filename={activeFile.name} />
+          {isActiveFileText ? (
+            <CodeEditor
+              key={activeFile._id}
+              initialValue={activeFile.content}
+              filename={activeFile.name}
+              onChange={(value: string) => {
+                if (timeoutRef.current) {
+                  clearTimeout(timeoutRef.current);
+                }
+                timeoutRef.current = setTimeout(() => {
+                  updateFileContent({
+                    fileId: activeFile._id,
+                    content: value,
+                  });
+                }, 500);
+              }}
+            />
           ) : (
             <div className="flex items-center justify-center size-full">
               <Image
                 src="/logo.svg"
                 alt="No file selected"
+                width={250}
+                height={250}
+                className="opacity-25 grayscale"
+              />
+            </div>
+          )}
+          {isActiveFileBinary && (
+            //Todo: Display preview for binary files
+            <div className="flex items-center justify-center size-full">
+              <Image
+                src="/logo.svg"
+                alt="Binary file preview not available"
                 width={250}
                 height={250}
                 className="opacity-25 grayscale"

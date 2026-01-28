@@ -90,7 +90,7 @@
   }
 
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 select-none;
   }
 
   body {
@@ -226,12 +226,16 @@
 }
 
 /* Allotment gutter - the "living seam" */
-.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1 {
+.allotment-module_splitView__M-8vX
+  > .allotment-module_splitViewContainer__rQnVa
+  > .allotment-module_sash__neVb1 {
   background: transparent !important;
   transition: background 0.2s ease;
 }
 
-.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1::before {
+.allotment-module_splitView__M-8vX
+  > .allotment-module_splitViewContainer__rQnVa
+  > .allotment-module_sash__neVb1::before {
   content: "";
   position: absolute;
   top: 0;
@@ -243,17 +247,23 @@
   transition: all 0.2s ease;
 }
 
-.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1:hover::before,
-.allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1.allotment-module_active__mstRE::before {
+.allotment-module_splitView__M-8vX
+  > .allotment-module_splitViewContainer__rQnVa
+  > .allotment-module_sash__neVb1:hover::before,
+.allotment-module_splitView__M-8vX
+  > .allotment-module_splitViewContainer__rQnVa
+  > .allotment-module_sash__neVb1.allotment-module_active__mstRE::before {
   width: 3px;
   background: var(--ai);
   box-shadow: 0 0 12px 2px var(--ai-glow);
 }
 
 /* AI thinking state for gutter */
-.gutter-thinking .allotment-module_splitView__M-8vX > .allotment-module_splitViewContainer__rQnVa > .allotment-module_sash__neVb1::before {
+.gutter-thinking
+  .allotment-module_splitView__M-8vX
+  > .allotment-module_splitViewContainer__rQnVa
+  > .allotment-module_sash__neVb1::before {
   background: var(--ai);
   box-shadow: 0 0 12px 2px var(--ai-glow);
   animation: ai-pulse 2s ease-in-out infinite;
 }
-

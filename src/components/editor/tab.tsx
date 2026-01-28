@@ -23,9 +23,6 @@ export default function Tab({ fileId, projectId, isFirst }: TabProps) {
   const isActive = fileId === activeTabId;
   const isPreview = fileId === previewTabId;
 
-  // TODO: Track modified state when content editing is implemented
-  const isModified = false;
-
   return (
     <div
       onClick={() => setActiveTab(fileId)}
@@ -48,30 +45,26 @@ export default function Tab({ fileId, projectId, isFirst }: TabProps) {
       <span className={cn("text-sm whitespace-nowrap", isPreview && "italic")}>
         {file?.name}
       </span>
-      {isModified ? (
-        <span className="size-1.5 rounded-full bg-primary shrink-0" />
-      ) : (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            closeTab(fileId);
-          }}
-          onKeyDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            closeTab(fileId);
-          }}
-          className={cn(
-            "ml-1 size-4 flex items-center justify-center rounded hover:bg-accent opacity-100 hover:bg-white/ shrink-0",
-            !isActive && "opacity-0 group-hover:opacity-100 transition-opacity",
-          )}
-        >
-          <XIcon className="size-3" />
-        </Button>
-      )}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeTab(fileId);
+        }}
+        onKeyDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeTab(fileId);
+        }}
+        className={cn(
+          "ml-1 size-4 flex items-center justify-center rounded hover:bg-accent opacity-100 hover:bg-white/ shrink-0",
+          !isActive && "opacity-0 group-hover:opacity-100 transition-opacity",
+        )}
+      >
+        <XIcon className="size-3" />
+      </Button>
     </div>
   );
 }
