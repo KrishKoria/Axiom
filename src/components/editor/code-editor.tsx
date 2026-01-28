@@ -7,6 +7,7 @@ import { indentWithTab } from "@codemirror/commands";
 import { minimap } from "./extensions/minimap";
 import { indentationMarkers } from "@replit/codemirror-indentation-markers";
 import { customSetup } from "./extensions/custom-setup";
+import { suggestion } from "./extensions/suggestions";
 interface CodeEditorProps {
   filename: string;
   initialValue?: string;
@@ -34,6 +35,7 @@ export default function CodeEditor({
         customTheme,
         languageExtensions,
         minimap(),
+        suggestion(filename),
         keymap.of([indentWithTab]),
         indentationMarkers(),
         EditorView.updateListener.of((update) => {
