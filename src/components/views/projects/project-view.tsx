@@ -92,14 +92,12 @@ export default function ProjectView() {
 
   // Keyboard shortcut handlers
   const handleNew = useCallback(() => {
-    console.log("New Project");
     createProject({
       name: generateName(),
     });
   }, [createProject]);
 
   const handleImport = useCallback(() => {
-    console.log("Import project");
     // TODO: Implement import action
   }, []);
 

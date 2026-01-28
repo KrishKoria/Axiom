@@ -1,3 +1,4 @@
+import { fetcher } from "@/components/editor/extensions/suggestions/fetcher";
 import { StateEffect, StateField } from "@codemirror/state";
 import {
   Decoration,
@@ -40,6 +41,40 @@ class SuggestionWidget extends WidgetType {
 let debounceTimer: number | null = null;
 let isWaitingForSuggestion = false;
 const DEBOUNCE_DELAY = 300; // milliseconds
+let currentAbortController: AbortController | null = null;
+
+const generatePayload = (view: EditorView, fileName: string) => {
+  const code = view.state.doc.toString();
+  if (!code || code.trim().length === 0) return null;
+
+  const cursorPosition = view.state.selection.main.head;
+  const currentLine = view.state.doc.lineAt(cursorPosition);
+  const cursorInLine = cursorPosition - currentLine.from;
+
+  const previousLines: string[] = [];
+  const previousLinesToFetch = Math.min(8, currentLine.number - 1);
+  for (let i = previousLinesToFetch; i >= 1; i--) {
+    previousLines.push(view.state.doc.line(currentLine.number - i).text);
+  }
+
+  const nextLines: string[] = [];
+  const totalLines = view.state.doc.lines;
+  const linesToFetch = Math.min(8, totalLines - currentLine.number);
+  for (let i = 1; i <= linesToFetch; i++) {
+    nextLines.push(view.state.doc.line(currentLine.number + i).text);
+  }
+
+  return {
+    fileName,
+    code,
+    currentLine: currentLine.text,
+    previousLines: previousLines.join("\n"),
+    textBeforeCursor: currentLine.text.slice(0, cursorInLine),
+    textAfterCursor: currentLine.text.slice(cursorInLine),
+    nextLines: nextLines.join("\n"),
+    lineNumber: currentLine.number,
+  };
+};
 
 const debouncePlugin = (filename: string) => {
   return ViewPlugin.fromClass(
@@ -56,13 +91,22 @@ const debouncePlugin = (filename: string) => {
         if (debounceTimer) {
           clearTimeout(debounceTimer);
         }
+        if (currentAbortController !== null) {
+          currentAbortController.abort();
+        }
         isWaitingForSuggestion = true;
         debounceTimer = window.setTimeout(async () => {
-          const cursorPos = view.state.selection.main.head;
-          const line = view.state.doc.lineAt(cursorPos);
-          const textBeforeCursor = line.text.slice(0, cursorPos - line.from);
-          // Simulate an API call to get suggestion
-          const suggestion = "Hello World!";
+          const payload = generatePayload(view, filename);
+          if (!payload) {
+            isWaitingForSuggestion = false;
+            view.dispatch({ effects: setSuggestionEffect.of(null) });
+            return;
+          }
+          currentAbortController = new AbortController();
+          const suggestion = await fetcher(
+            payload,
+            currentAbortController.signal,
+          );
           isWaitingForSuggestion = false;
           view.dispatch({
             effects: setSuggestionEffect.of(suggestion),
@@ -72,6 +116,9 @@ const debouncePlugin = (filename: string) => {
       destroy() {
         if (debounceTimer) {
           clearTimeout(debounceTimer);
+        }
+        if (currentAbortController !== null) {
+          currentAbortController.abort();
         }
       }
     },
@@ -94,10 +141,8 @@ const renderPlugin = ViewPlugin.fromClass(
       }
     }
     build(view: EditorView) {
-      if (isWaitingForSuggestion) {
-        return Decoration.none;
-      }
       const suggestion = view.state.field(suggestionState);
+
       if (!suggestion) {
         return Decoration.none;
       }
