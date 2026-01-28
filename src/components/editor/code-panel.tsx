@@ -10,7 +10,10 @@ import { Id } from "../../../convex/_generated/dataModel";
 import PreviewTabContent from "./preview-tab";
 import EditorTabs from "./editor-tabs";
 import { useEditor } from "@/hooks/use-editor";
-import FileBreadCrumbs from "./file-bread-crumbs";
+import { FileBreadCrumbs } from "./file-bread-crumbs";
+import { useFile } from "@/hooks/use-files";
+import Image from "next/image";
+import CodeEditor from "./code-editor";
 
 const MIN_FILE_TREE_WIDTH = 160;
 const MAX_FILE_TREE_WIDTH = 400;
@@ -21,50 +24,6 @@ interface CodePanelProps {
 }
 
 type PanelTab = "code" | "preview";
-
-function CodeEditor() {
-  const lines = [
-    { num: 1, content: 'import { useState } from "react";', indent: 0 },
-    { num: 2, content: "", indent: 0 },
-    { num: 3, content: "export default function App() {", indent: 0 },
-    { num: 4, content: "  const [count, setCount] = useState(0);", indent: 0 },
-    { num: 5, content: "", indent: 0 },
-    { num: 6, content: "  return (", indent: 0 },
-    { num: 7, content: '    <div className="app">', indent: 0 },
-    { num: 8, content: "      <h1>Hello, Axiom!</h1>", indent: 0 },
-    { num: 9, content: "      <p>Count: {count}</p>", indent: 0 },
-    {
-      num: 10,
-      content: "      <button onClick={() => setCount(c => c + 1)}>",
-      indent: 0,
-    },
-    { num: 11, content: "        Increment", indent: 0 },
-    { num: 12, content: "      </button>", indent: 0 },
-    { num: 13, content: "    </div>", indent: 0 },
-    { num: 14, content: "  );", indent: 0 },
-    { num: 15, content: "}", indent: 0 },
-  ];
-
-  return (
-    <div className="flex-1 overflow-auto font-mono text-sm bg-background">
-      <div className="min-w-max">
-        {lines.map((line) => (
-          <div
-            key={line.num}
-            className="flex hover:bg-muted/30 transition-colors"
-          >
-            <span className="w-12 px-3 text-right text-muted-foreground select-none border-r border-border">
-              {line.num}
-            </span>
-            <pre className="flex-1 px-4 whitespace-pre">
-              <code>{line.content || " "}</code>
-            </pre>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function TerminalPanel() {
   return (
@@ -90,6 +49,7 @@ function TerminalPanel() {
 
 function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
   const { activeTabId } = useEditor(projectId);
+  const activeFile = useFile(activeTabId);
   return (
     <Allotment className="h-full">
       <Allotment.Pane
@@ -105,8 +65,20 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
       <Allotment.Pane>
         <div className="h-full flex flex-col min-w-0">
           <EditorTabs projectId={projectId} />
-          {activeTabId && <FileBreadCrumbs fileId={activeTabId} />}
-          {activeTabId ? <CodeEditor /> : null}
+          {activeTabId && <FileBreadCrumbs projectId={projectId} />}
+          {activeFile ? (
+            <CodeEditor filename={activeFile.name} />
+          ) : (
+            <div className="flex items-center justify-center size-full">
+              <Image
+                src="/logo.svg"
+                alt="No file selected"
+                width={250}
+                height={250}
+                className="opacity-25 grayscale"
+              />
+            </div>
+          )}
           {/* <TerminalPanel /> */}
         </div>
       </Allotment.Pane>
