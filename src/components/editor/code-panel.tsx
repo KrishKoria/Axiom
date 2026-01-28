@@ -11,9 +11,10 @@ import PreviewTabContent from "./preview-tab";
 import EditorTabs from "./editor-tabs";
 import { useEditor } from "@/hooks/use-editor";
 import { FileBreadCrumbs } from "./file-bread-crumbs";
-import { useFile, useUpdateFileContent } from "@/hooks/use-files";
+import { useFile, useUpdateFileContent, useFileUrl } from "@/hooks/use-files";
 import Image from "next/image";
 import CodeEditor from "./code-editor";
+import { BinaryFilePreview } from "./binary-file-preview";
 
 const MIN_FILE_TREE_WIDTH = 160;
 const MAX_FILE_TREE_WIDTH = 400;
@@ -52,6 +53,7 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
   const activeFile = useFile(activeTabId);
   const updateFileContent = useUpdateFileContent();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const fileUrl = useFileUrl(activeFile?.storageId);
   const isActiveFileBinary = activeFile && activeFile.storageId;
   const isActiveFileText = activeFile && !activeFile.storageId;
   return (
@@ -98,17 +100,11 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
               />
             </div>
           )}
-          {isActiveFileBinary && (
-            //Todo: Display preview for binary files
-            <div className="flex items-center justify-center size-full">
-              <Image
-                src="/logo.svg"
-                alt="Binary file preview not available"
-                width={250}
-                height={250}
-                className="opacity-25 grayscale"
-              />
-            </div>
+          {isActiveFileBinary && activeFile && (
+            <BinaryFilePreview
+              filename={activeFile.name}
+              url={fileUrl}
+            />
           )}
           {/* <TerminalPanel /> */}
         </div>

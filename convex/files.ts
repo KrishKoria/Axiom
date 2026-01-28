@@ -109,6 +109,15 @@ export const getFilePath = query({
   },
 });
 
+export const getFileUrl = query({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.storageId);
+  },
+});
+
 export const createFile = mutation({
   args: {
     projectId: v.id("projects"),

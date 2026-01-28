@@ -157,3 +157,7 @@ export const useFilePath = (fileId: Id<"files"> | null) => {
 export const useUpdateFileContent = () => {
   return useMutation(api.files.updateFileContent);
 };
+
+export const useFileUrl = (storageId: Id<"_storage"> | undefined) => {
+  return useQuery(api.files.getFileUrl, storageId ? { storageId } : "skip");
+};
