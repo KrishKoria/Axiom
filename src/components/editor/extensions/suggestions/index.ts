@@ -39,9 +39,9 @@ class SuggestionWidget extends WidgetType {
 }
 
 let debounceTimer: number | null = null;
-let isWaitingForSuggestion = false;
 const DEBOUNCE_DELAY = 300; // milliseconds
 let currentAbortController: AbortController | null = null;
+let isWaitingForSuggestion = false;
 
 const generatePayload = (view: EditorView, fileName: string) => {
   const code = view.state.doc.toString();
@@ -141,6 +141,9 @@ const renderPlugin = ViewPlugin.fromClass(
       }
     }
     build(view: EditorView) {
+      if (isWaitingForSuggestion) {
+        return Decoration.none;
+      }
       const suggestion = view.state.field(suggestionState);
 
       if (!suggestion) {

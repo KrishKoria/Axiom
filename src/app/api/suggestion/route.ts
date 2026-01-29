@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { generateText, Output } from "ai";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import { auth } from "@clerk/nextjs/server";
+import { anthropic } from "@/lib/utils";
 const suggestionSchema = z.object({
   suggestion: z
     .string()
@@ -10,8 +10,6 @@ const suggestionSchema = z.object({
       "The code snippet to insert at cursor, or empty string if no suggestion/completion is needed.",
     ),
 });
-
-const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
 const SUGGESTION_PROMPT = `You are a code suggestion assistant that provides inline completions.
 

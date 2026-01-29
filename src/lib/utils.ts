@@ -1,3 +1,4 @@
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
@@ -31,3 +32,7 @@ export function generateName() {
     style: "lowerCase",
   });
 }
+
+export const anthropic = createAnthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+});
