@@ -121,7 +121,7 @@ export function ConversationPanel({ projectId }: ConversationPanelProps) {
     <div className="flex flex-col h-full bg-sidebar relative overflow-hidden">
       {/* Subtle ambient gradient */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-ai/[0.03] blur-[100px] rounded-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-75 bg-ai/3 blur-[100px] rounded-full" />
       </div>
 
       {/* Header */}
@@ -131,7 +131,7 @@ export function ConversationPanel({ projectId }: ConversationPanelProps) {
             <SparklesIcon className="size-3 text-ai" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-medium truncate max-w-[180px]">
+            <span className="text-sm font-medium truncate max-w-45">
               {activeConversation?.title ?? DEFAULT_CONVERSATION_TITLE}
             </span>
           </div>
@@ -201,10 +201,10 @@ export function ConversationPanel({ projectId }: ConversationPanelProps) {
 
       {/* Input Area */}
       <div className="relative p-4 pt-2">
-        <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-t from-sidebar to-transparent pointer-events-none -translate-y-full" />
+        <div className="absolute inset-x-0 top-0 h-12 bg-linear-to-t from-sidebar to-transparent pointer-events-none -translate-y-full" />
         <PromptInput
           onSubmit={handleSubmit}
-          className="shadow-lg shadow-black/[0.03] dark:shadow-black/20 ring-1 ring-border/50 bg-background/80 backdrop-blur-sm transition-all duration-300 focus-within:ring-ai/30 focus-within:shadow-ai/5"
+          className="shadow-lg shadow-black/3 dark:shadow-black/20 ring-1 ring-border/50 bg-background/80 backdrop-blur-sm transition-all duration-300 focus-within:ring-ai/30 focus-within:shadow-ai/5"
         >
           <PromptInputBody>
             <PromptInputTextarea

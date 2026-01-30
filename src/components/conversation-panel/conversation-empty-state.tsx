@@ -40,7 +40,7 @@ export function ConversationEmptyState() {
         </div>
 
         {/* Main orb */}
-        <div className="relative size-16 rounded-2xl bg-gradient-to-br from-ai/20 via-ai/10 to-transparent flex items-center justify-center ring-1 ring-ai/20 backdrop-blur-sm shadow-lg shadow-ai/10">
+        <div className="relative size-16 rounded-2xl bg-linear-to-br from-ai/20 via-ai/10 to-transparent flex items-center justify-center ring-1 ring-ai/20 backdrop-blur-sm shadow-lg shadow-ai/10">
           <SparklesIcon className="size-7 text-ai" />
         </div>
 
@@ -57,10 +57,10 @@ export function ConversationEmptyState() {
         transition={{ duration: 0.4, delay: 0.1 }}
         className="text-center mb-8"
       >
-        <h3 className="text-lg font-medium mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h3 className="text-lg font-medium mb-2 bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
           How can I help?
         </h3>
-        <p className="text-sm text-muted-foreground/70 max-w-[280px]">
+        <p className="text-sm text-muted-foreground/70 max-w-70">
           Ask questions about your code, get suggestions, or explore new ideas
         </p>
       </motion.div>
@@ -70,7 +70,7 @@ export function ConversationEmptyState() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="flex flex-col gap-2 w-full max-w-[280px]"
+        className="flex flex-col gap-2 w-full max-w-70"
       >
         {suggestions.map((suggestion, index) => (
           <motion.button
