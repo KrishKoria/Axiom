@@ -59,7 +59,7 @@ export default function Tab({ fileId, projectId, isFirst }: TabProps) {
           closeTab(fileId);
         }}
         className={cn(
-          "ml-1 size-4 flex items-center justify-center rounded hover:bg-accent opacity-100 hover:bg-white/ shrink-0",
+          "ml-1 size-4 flex items-center justify-center rounded hover:bg-accent opacity-100 shrink-0",
           !isActive && "opacity-0 group-hover:opacity-100 transition-opacity",
         )}
       >

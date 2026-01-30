@@ -31,9 +31,36 @@ class SuggestionWidget extends WidgetType {
   toDOM() {
     const span = document.createElement("span");
     span.textContent = this.suggestion;
-    span.style.opacity = "0.5";
+
+    // AI-themed styling with subtle cyan tint
+    span.style.color = "oklch(0.75 0.08 195)"; // Subtle cyan color
+    span.style.opacity = "0.55";
     span.style.pointerEvents = "none";
     span.style.fontStyle = "italic";
+    span.style.textShadow = "0 0 8px oklch(0.75 0.12 195 / 0.3)"; // Subtle cyan glow
+
+    // Fade-in animation for new suggestions
+    span.style.animation = "suggestion-fade-in 0.2s ease-out";
+
+    // Add keyframes if not already present
+    if (!document.querySelector("#suggestion-keyframes")) {
+      const style = document.createElement("style");
+      style.id = "suggestion-keyframes";
+      style.textContent = `
+        @keyframes suggestion-fade-in {
+          from {
+            opacity: 0;
+            transform: translateX(-2px);
+          }
+          to {
+            opacity: 0.55;
+            transform: translateX(0);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
     return span;
   }
 }

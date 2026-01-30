@@ -49,26 +49,27 @@ const createQuickEditTooltip = (state: EditorState): readonly Tooltip[] => {
       create() {
         const dom = document.createElement("div");
         dom.className =
-          "bg-popover text-popover-foreground z-50 rounded-sm border border-input p-2 shadow-md flex flex-col gap-2 text-sm";
+          "bg-popover text-popover-foreground z-50 rounded-lg border border-[oklch(0.75_0.12_195_/_0.3)] p-3 shadow-lg min-w-[320px] flex flex-col gap-3 text-sm transition-shadow duration-200";
+        dom.style.boxShadow = "0 0 12px 2px oklch(0.75 0.12 195 / 0.25)";
 
         const form = document.createElement("form");
-        form.className = "flex flex-col gap-2";
+        form.className = "flex flex-col gap-3";
 
         const input = document.createElement("input");
         input.type = "text";
-        input.placeholder = "Edit selected code";
+        input.placeholder = "Edit selected code...";
         input.className =
-          "bg-transparent border-none outline-none px-2 py-1 font-sans w-100";
+          "rounded-lg border border-input bg-background px-4 py-3 font-sans outline-none transition-all duration-200 placeholder:text-muted-foreground focus:ring-2 focus:ring-[oklch(0.75_0.12_195_/_0.5)]";
         input.autofocus = true;
 
         const buttonContainer = document.createElement("div");
-        buttonContainer.className = "flex items-center justify-between gap-2";
+        buttonContainer.className = "flex items-center justify-end gap-2";
 
         const cancelButton = document.createElement("button");
         cancelButton.type = "button";
         cancelButton.textContent = "Cancel";
         cancelButton.className =
-          "font-sans p-1 px-2 text-muted-foreground hover:text-foreground hover:bg-foreground/10 rounded-sm";
+          "font-sans px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors duration-200";
         cancelButton.onclick = () => {
           if (currentAbortController) {
             currentAbortController.abort();
@@ -85,7 +86,7 @@ const createQuickEditTooltip = (state: EditorState): readonly Tooltip[] => {
         submitButton.type = "submit";
         submitButton.textContent = "Submit";
         submitButton.className =
-          "font-sans p-1 px-2 text-muted-foreground hover:text-foreground hover:bg-foreground/10 rounded-sm";
+          "font-sans px-3 py-1.5 text-sm bg-[oklch(0.75_0.12_195)] text-white hover:bg-[oklch(0.7_0.12_195)] rounded-md transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed";
 
         form.onsubmit = async (e) => {
           e.preventDefault();
@@ -104,6 +105,8 @@ const createQuickEditTooltip = (state: EditorState): readonly Tooltip[] => {
 
           submitButton.disabled = true;
           submitButton.textContent = "Editing...";
+          dom.style.animation = "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite";
+          dom.style.boxShadow = "0 0 20px 4px oklch(0.75 0.12 195 / 0.4)";
 
           currentAbortController = new AbortController();
           const editedCode = await fetcher(
@@ -128,6 +131,8 @@ const createQuickEditTooltip = (state: EditorState): readonly Tooltip[] => {
           } else {
             submitButton.disabled = false;
             submitButton.textContent = "Submit";
+            dom.style.animation = "";
+            dom.style.boxShadow = "0 0 12px 2px oklch(0.75 0.12 195 / 0.25)";
           }
 
           currentAbortController = null;

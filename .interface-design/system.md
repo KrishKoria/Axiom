@@ -326,9 +326,15 @@ className={cn(
   "hover:bg-accent/40",
   // Focus: violet ring with subtle background
   "focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:bg-accent/20",
-  // Active/selected: background + left border indicator
-  isActive && "bg-accent/30 border-l-2 border-primary",
+  // Active/selected: stronger background + left border + explicit text color
+  isActive && "bg-accent/40 border-l-2 border-primary text-foreground",
 )}
+// Padding compensation: reduce left padding by 2px when active to prevent content shift
+style={{
+  paddingLeft: isActive
+    ? `calc(${getItemPadding(depth, isFile)} - 2px)`
+    : getItemPadding(depth, isFile)
+}}
 ```
 
 **Project row:**
@@ -469,6 +475,71 @@ Dark mode is the default experience. The futuristic feel is strongest in dark.
 - Higher contrast for accessibility
 
 Light mode is available but secondary.
+
+---
+
+## Empty States
+
+### Editor Empty State (No File Open)
+
+An animated, AI-branded empty state that feels futuristic and actionable.
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│              ✨ (pulsing)               │
+│                                         │
+│           No file open                  │
+│   Select a file or press [Ctrl+P]       │
+│                                         │
+│        [✨ Create new file]             │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Structure:**
+
+```tsx
+<div className="flex items-center justify-center size-full">
+  <div className="flex flex-col items-center gap-6 max-w-sm px-6">
+    {/* Animated sparkle with glow */}
+    <div className="relative">
+      <div className="absolute inset-0 animate-ai-pulse rounded-full" />
+      <SparklesIcon className="size-12 text-ai relative z-10" />
+    </div>
+
+    {/* Text content */}
+    <div className="flex flex-col items-center gap-2 text-center">
+      <p className="text-sm font-medium text-muted-foreground">
+        No file open
+      </p>
+      <p className="text-xs text-muted-foreground/70">
+        Select a file from the explorer or press{" "}
+        <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono">
+          Ctrl+P
+        </kbd>
+      </p>
+    </div>
+
+    {/* Action button with AI accent on hover */}
+    <button className="group flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background hover:bg-accent/50 hover:border-ai/50 transition-all duration-200">
+      <SparklesIcon className="size-3.5 text-ai group-hover:animate-ai-thinking" />
+      <span className="text-xs font-medium text-foreground">
+        Create new file
+      </span>
+    </button>
+  </div>
+</div>
+```
+
+**Key patterns:**
+
+- Centered layout with `flex-col items-center`
+- Sparkle icon with `ai-pulse` animation for the glow effect
+- Muted text hierarchy: primary message at `text-sm`, hint at `text-xs`
+- Keyboard shortcut inline with hint text
+- Action button uses cyan accent on hover (`hover:border-ai/50`)
+- Button icon animates with `ai-thinking` on hover
 
 ---
 

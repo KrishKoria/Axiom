@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Allotment } from "allotment";
-import { TerminalIcon, CodeIcon, PlayIcon, GithubIcon } from "lucide-react";
+import {
+  TerminalIcon,
+  CodeIcon,
+  PlayIcon,
+  GithubIcon,
+  SparklesIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FileTreeSidebar } from "../explorer/file-explorer";
@@ -12,7 +18,6 @@ import EditorTabs from "./editor-tabs";
 import { useEditor } from "@/hooks/use-editor";
 import { FileBreadCrumbs } from "./file-bread-crumbs";
 import { useFile, useUpdateFileContent, useFileUrl } from "@/hooks/use-files";
-import Image from "next/image";
 import CodeEditor from "./code-editor";
 import { BinaryFilePreview } from "./binary-file-preview";
 
@@ -99,13 +104,20 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
             />
           ) : (
             <div className="flex items-center justify-center size-full">
-              <Image
-                src="/logo.svg"
-                alt="No file selected"
-                width={250}
-                height={250}
-                className="opacity-25 grayscale"
-              />
+              <div className="flex flex-col items-center gap-6 max-w-sm px-6">
+                <div className="relative">
+                  <div className="absolute inset-0 animate-ai-pulse rounded-full" />
+                  <SparklesIcon className="size-12 text-ai relative z-10" />
+                </div>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    No file open
+                  </p>
+                  <p className="text-xs text-muted-foreground/70">
+                    Select a file from the explorer.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
           {isActiveFileBinary && activeFile && (

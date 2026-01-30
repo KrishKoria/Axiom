@@ -24,23 +24,27 @@ const createTooltipForSelection = (state: EditorState): readonly Tooltip[] => {
       create() {
         const dom = document.createElement("div");
         dom.className =
-          "bg-popover text-popover-foreground z-50 rounded-sm border border-input p-1 shadow-md flex items-center gap-2 text-sm";
+          "bg-popover text-popover-foreground z-50 rounded-sm border border-input p-1 shadow-md flex items-center gap-1 text-sm font-sans";
 
+        // Add to Chat button
         const addToChatButton = document.createElement("button");
         addToChatButton.textContent = "Add to Chat";
         addToChatButton.className =
-          "font-sans p-1 px-2 hover:bg-foreground/10 rounded-sm";
+          "px-2 py-1 hover:bg-foreground/10 rounded-sm transition-colors duration-150";
 
+        // Quick Edit button with cyan accent (AI feature)
         const quickEditButton = document.createElement("button");
         quickEditButton.className =
-          "font-sans p-1 px-2 hover:bg-foreground/10 rounded-sm flex items-center gap-1";
+          "px-2 py-1 hover:bg-foreground/10 rounded-sm transition-colors duration-150 flex items-center gap-1.5 text-cyan-400";
 
         const quickEditButtonText = document.createElement("span");
         quickEditButtonText.textContent = "Quick Edit";
 
-        const quickEditButtonShortcut = document.createElement("span");
+        // Keyboard shortcut styled as kbd element
+        const quickEditButtonShortcut = document.createElement("kbd");
         quickEditButtonShortcut.textContent = "⌘K";
-        quickEditButtonShortcut.className = "text-sm opacity-60";
+        quickEditButtonShortcut.className =
+          "px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono text-muted-foreground";
 
         quickEditButton.appendChild(quickEditButtonText);
         quickEditButton.appendChild(quickEditButtonShortcut);
