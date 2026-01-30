@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { convex } from "@/lib/convex-client";
 import { api } from "../../../../convex/_generated/api";
+import { inngest } from "@/inngest/client";
 
 const requestSchema = z.object({
   conversationId: z.string(),
@@ -66,10 +67,18 @@ export async function POST(request: Request) {
   });
 
   //TODO: Trigger Inngest to process the message
-
+  const event = await inngest.send({
+    name: "message/sent",
+    data: {
+      messageId: assistantMessageId,
+      conversationId,
+      projectId,
+      message,
+    },
+  });
   return NextResponse.json({
     success: true,
-    eventId: 0, //TODO: Return actual event ID
+    eventId: event.ids[0],
     messageId: assistantMessageId,
   });
 }
