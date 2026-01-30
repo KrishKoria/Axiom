@@ -43,6 +43,7 @@ export default defineSchema({
     title: v.string(),
     updatedAt: v.number(),
   }).index("byProject", ["projectId"]),
+
   messages: defineTable({
     conversationId: v.id("conversations"),
     role: v.union(v.literal("user"), v.literal("assistant")),

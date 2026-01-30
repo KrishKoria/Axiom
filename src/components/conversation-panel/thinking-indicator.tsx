@@ -6,7 +6,7 @@ export default function ThinkingIndicator() {
       {/* Pulsing orb container */}
       <div className="relative">
         <div className="absolute inset-0 rounded-lg bg-ai/20 blur-md animate-ai-pulse" />
-        <div className="relative size-8 rounded-lg bg-gradient-to-br from-ai/20 to-ai/10 flex items-center justify-center ring-1 ring-ai/30 backdrop-blur-sm">
+        <div className="relative size-8 rounded-lg bg-linear-to-br from-ai/20 to-ai/10 flex items-center justify-center ring-1 ring-ai/30 backdrop-blur-sm">
           <SparklesIcon className="size-3.5 text-ai animate-pulse" />
         </div>
       </div>
@@ -34,7 +34,7 @@ export default function ThinkingIndicator() {
         </div>
 
         {/* Subtle progress line */}
-        <div className="mt-3 h-px w-24 bg-gradient-to-r from-ai/40 via-ai/20 to-transparent overflow-hidden rounded-full">
+        <div className="mt-3 h-px w-24 bg-linear-to-r from-ai/40 via-ai/20 to-transparent overflow-hidden rounded-full">
           <div className="h-full w-8 bg-ai/60 animate-[shimmer_1.5s_ease-in-out_infinite] rounded-full" />
         </div>
       </div>

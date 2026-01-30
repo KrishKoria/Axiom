@@ -24,7 +24,6 @@ export const processMessage = inngest.createFunction(
       const { messageId } = event.data.event.data as MessageEvent;
       const internalKey = process.env.POLARIS_CONVEX_INTERNAL_KEY;
 
-      // Update the message with error content
       if (internalKey) {
         await step.run("update-message-on-failure", async () => {
           await convex.mutation(api.system.updateMessageContent, {
@@ -52,7 +51,7 @@ export const processMessage = inngest.createFunction(
     }
 
     //TODO: implement AI processing logic here
-    await step.sleep("wait-for-ai-response", "5s");
+    await step.sleep("wait-for-ai-response", "15s");
 
     await step.run("update-assistant-message", async () => {
       await convex.mutation(api.system.updateMessageContent, {
