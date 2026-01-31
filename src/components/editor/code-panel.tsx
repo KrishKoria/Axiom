@@ -2,13 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Allotment } from "allotment";
-import {
-  TerminalIcon,
-  CodeIcon,
-  PlayIcon,
-  GithubIcon,
-  SparklesIcon,
-} from "lucide-react";
+import { CodeIcon, PlayIcon, GithubIcon, SparklesIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FileTreeSidebar } from "../explorer/file-explorer";
@@ -30,28 +24,6 @@ interface CodePanelProps {
 }
 
 type PanelTab = "code" | "preview";
-
-function TerminalPanel() {
-  return (
-    <div className="h-48 border-t border-border bg-card flex flex-col">
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-muted/30">
-        <TerminalIcon className="size-3.5 text-muted-foreground" />
-        <span className="text-xs font-medium text-muted-foreground">
-          Terminal
-        </span>
-      </div>
-      <div className="flex-1 p-3 font-mono text-xs overflow-auto">
-        <div className="text-muted-foreground">$ npm run dev</div>
-        <div className="text-foreground mt-1">
-          <span className="text-success">▸</span> Ready on http://localhost:3000
-        </div>
-        <div className="text-muted-foreground mt-1 flex items-center gap-1">
-          <span className="animate-pulse">█</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
   const { activeTabId } = useEditor(projectId);
@@ -123,7 +95,6 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
           {isActiveFileBinary && activeFile && (
             <BinaryFilePreview filename={activeFile.name} url={fileUrl} />
           )}
-          {/* <TerminalPanel /> */}
         </div>
       </Allotment.Pane>
     </Allotment>
