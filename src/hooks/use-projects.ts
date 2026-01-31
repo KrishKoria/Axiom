@@ -11,7 +11,7 @@ export function useProjectsPartial(limit: number) {
 }
 
 export function useProject(projectId: Id<"projects">) {
-  return useQuery(api.projects.getById, { id: projectId });
+  return useQuery(api.projects.getProjectById, { id: projectId });
 }
 
 export function useCreateProject() {
@@ -54,13 +54,13 @@ export function useCreateProject() {
 export const useRenameProject = () => {
   return useMutation(api.projects.rename).withOptimisticUpdate(
     (localStore, args) => {
-      const existingProject = localStore.getQuery(api.projects.getById, {
+      const existingProject = localStore.getQuery(api.projects.getProjectById, {
         id: args.id,
       });
 
       if (existingProject !== undefined && existingProject !== null) {
         localStore.setQuery(
-          api.projects.getById,
+          api.projects.getProjectById,
           { id: args.id },
           {
             ...existingProject,

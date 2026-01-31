@@ -3,7 +3,7 @@ import { Id } from "../../convex/_generated/dataModel";
 import { api } from "../../convex/_generated/api";
 
 export const useConversation = (id: Id<"conversations"> | null) => {
-  return useQuery(api.conversations.getById, id ? { id } : "skip");
+  return useQuery(api.conversations.getConversationById, id ? { id } : "skip");
 };
 
 export const useMessages = (conversationId: Id<"conversations"> | null) => {

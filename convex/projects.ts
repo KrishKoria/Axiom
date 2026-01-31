@@ -41,7 +41,7 @@ export const get = query({
   },
 });
 
-export const getById = query({
+export const getProjectById = query({
   args: {
     id: v.id("projects"),
   },

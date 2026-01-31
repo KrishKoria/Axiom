@@ -10,6 +10,36 @@ interface PreviewTerminalProps {
   output: string;
 }
 
+// Purple-tinted terminal theme matching Axiom design system
+const TERMINAL_THEME = {
+  background: "#1e1b2e", // Deep purple-tinted background (oklch ~0.17 0.02 284)
+  foreground: "#e8e4f0", // Light purple-tinted foreground
+  cursor: "#a78bfa", // Violet cursor (primary)
+  cursorAccent: "#1e1b2e",
+  selectionBackground: "#4c3d6650", // Muted violet selection
+  selectionForeground: "#e8e4f0",
+
+  // ANSI colors - purple-tinted variants
+  black: "#1e1b2e",
+  red: "#f87171", // Destructive
+  green: "#86efac", // Success
+  yellow: "#fbbf24", // Warning
+  blue: "#93c5fd",
+  magenta: "#c4b5fd", // Violet
+  cyan: "#67e8f9", // AI accent
+  white: "#e8e4f0",
+
+  // Bright variants
+  brightBlack: "#4a4458",
+  brightRed: "#fca5a5",
+  brightGreen: "#a7f3d0",
+  brightYellow: "#fcd34d",
+  brightBlue: "#bfdbfe",
+  brightMagenta: "#ddd6fe",
+  brightCyan: "#a5f3fc", // AI accent bright
+  brightWhite: "#f5f3ff",
+};
+
 export const PreviewTerminal = ({ output }: PreviewTerminalProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
@@ -24,8 +54,13 @@ export const PreviewTerminal = ({ output }: PreviewTerminalProps) => {
       convertEol: true,
       disableStdin: true,
       fontSize: 12,
-      fontFamily: "monospace",
-      theme: { background: "#1f2228" },
+      fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', 'Courier New', monospace",
+      lineHeight: 1.4,
+      letterSpacing: 0,
+      theme: TERMINAL_THEME,
+      cursorBlink: false,
+      cursorStyle: "block",
+      scrollback: 5000,
     });
 
     const fitAddon = new FitAddon();
@@ -76,7 +111,8 @@ export const PreviewTerminal = ({ output }: PreviewTerminalProps) => {
   return (
     <div
       ref={containerRef}
-      className="flex-1 min-h-0 p-3 [&_.xterm]:h-full! [&_.xterm-viewport]:h-full! [&_.xterm-screen]:h-full! bg-sidebar"
+      className="flex-1 min-h-0 px-3 py-2 [&_.xterm]:h-full! [&_.xterm-viewport]:h-full! [&_.xterm-screen]:h-full!"
+      style={{ backgroundColor: TERMINAL_THEME.background }}
     />
   );
 };

@@ -25,7 +25,7 @@ export const create = mutation({
   },
 });
 
-export const getById = query({
+export const getConversationById = query({
   args: {
     id: v.id("conversations"),
   },

@@ -66,17 +66,17 @@
 
 Base unit: 4px
 
-| Token | Value | Use             |
-| ----- | ----- | --------------- |
-| 1     | 4px   | Micro gaps      |
+| Token | Value | Use                                |
+| ----- | ----- | ---------------------------------- |
+| 1     | 4px   | Micro gaps                         |
 | 1.5   | 6px   | Fine adjustments (py-1.5, gap-1.5) |
-| 2     | 8px   | Tight spacing   |
-| 2.5   | 10px  | Icon containers (size-2.5) |
-| 3     | 12px  | Default gap     |
-| 4     | 16px  | Section padding |
-| 5     | 20px  | Card padding    |
-| 6     | 24px  | Large gaps      |
-| 8     | 32px  | Section margins |
+| 2     | 8px   | Tight spacing                      |
+| 2.5   | 10px  | Icon containers (size-2.5)         |
+| 3     | 12px  | Default gap                        |
+| 4     | 16px  | Section padding                    |
+| 5     | 20px  | Card padding                       |
+| 6     | 24px  | Large gaps                         |
+| 8     | 32px  | Section margins                    |
 
 > **Note:** While 4px is the base unit, 6px (1.5) and 10px (2.5) are acceptable for fine-tuning vertical rhythm and icon sizing.
 
@@ -152,6 +152,7 @@ className={cn(
 - AI actions: Cyan background
 
 **Sizes:**
+
 - `sm`: `h-8` or `size-8 p-0` for icon buttons
 - `default`: Standard padding
 
@@ -210,7 +211,8 @@ Tab bar for open files in the code editor.
 **Container:**
 
 ```tsx
-className="flex items-center gap-0 border-b border-border bg-muted/30 overflow-x-auto"
+className =
+  "flex items-center gap-0 border-b border-border bg-muted/30 overflow-x-auto";
 ```
 
 **Active tab:**
@@ -255,9 +257,9 @@ className={cn(
 
 ```tsx
 // Show dot before close button when file has unsaved changes
-{isModified && (
-  <span className="size-1.5 rounded-full bg-primary" />
-)}
+{
+  isModified && <span className="size-1.5 rounded-full bg-primary" />;
+}
 ```
 
 - Small violet dot indicates unsaved changes
@@ -273,6 +275,7 @@ className={cn(
 ```
 
 **File icons:**
+
 - Size: `size-3.5`
 - Color: `text-muted-foreground`
 - Use file-type specific icons when available
@@ -338,16 +341,19 @@ style={{
 ```
 
 **Project row:**
+
 - Use `font-semibold` on project name for visual hierarchy
 - Chevron with `transition-transform duration-150` for smooth expand/collapse
 
 **Create/Rename input:**
 
 ```tsx
-className="flex-1 bg-transparent text-sm outline-none transition-colors duration-150 focus:ring-2 focus:ring-primary/50 focus:bg-accent/10"
+className =
+  "flex-1 bg-transparent text-sm outline-none transition-colors duration-150 focus:ring-2 focus:ring-primary/50 focus:bg-accent/10";
 ```
 
 **Loading state:**
+
 - Match `h-6` height of regular items
 - Use `animate-pulse` for subtle loading indication
 - Spinner with `text-muted-foreground`
@@ -356,7 +362,10 @@ className="flex-1 bg-transparent text-sm outline-none transition-colors duration
 
 ```tsx
 <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-  <Button variant="highlight" className="size-5 flex items-center justify-center rounded hover:bg-accent">
+  <Button
+    variant="highlight"
+    className="size-5 flex items-center justify-center rounded hover:bg-accent"
+  >
     <FilePlus2Icon className="size-3.5 text-muted-foreground" />
   </Button>
 </div>
@@ -449,10 +458,70 @@ className="flex-1 bg-transparent text-sm outline-none transition-colors duration
 
 ### Preview Panel
 
-- Toolbar: URL bar + refresh + external link + device switcher
+- Toolbar: URL bar + refresh + external link + device switcher + terminal toggle + settings
 - Frame: Centered with responsive width based on device
-- Background: `bg-muted/20` to differentiate from content
+- Background: `bg-muted/20` to differentiate from content (non-desktop only)
 - Device frames: White background with shadow, rounded corners
+
+**Toolbar structure:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ [● URL bar]  [↻] [↗]            [🖥][📱][📱] │ [▣] [⚙]         │
+│  ↑ status      ↑ refresh         ↑ device      ↑ terminal       │
+│                ↑ external         switcher      ↑ settings       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**URL bar states:**
+
+- Loading: Cyan pulsing dot + spinner + status text
+- Ready: Green dot + URL (truncated, hover-copy button)
+- Error: Red dot + "Error" text
+
+**Loading state:**
+
+- Uses `animate-ai-pulse` on loading indicator
+- Cyan Loader2Icon spinner
+- Status-appropriate messaging
+
+### Preview Terminal
+
+Xterm.js-based terminal with purple-tinted theme matching the design system.
+
+**Terminal theme:**
+
+```typescript
+const TERMINAL_THEME = {
+  background: "#1e1b2e", // Deep purple-tinted background
+  foreground: "#e8e4f0", // Light purple-tinted foreground
+  cursor: "#a78bfa", // Violet cursor (primary)
+  cyan: "#67e8f9", // AI accent
+  magenta: "#c4b5fd", // Violet
+  // ... full ANSI palette
+};
+```
+
+**Terminal header:**
+
+```tsx
+<div
+  className={cn(
+    "group h-8 flex items-center justify-between px-3 border-b shrink-0 transition-colors",
+    isStreaming ? "border-ai/30 bg-ai/5" : "border-border/50 bg-muted/30",
+  )}
+/>
+```
+
+- Cyan accent when streaming (installing/running)
+- Pulsing dot indicator with "Running" text
+- Hover-visible copy/clear actions
+
+**Font:**
+
+- Family: `'IBM Plex Mono', 'Menlo', 'Monaco', 'Courier New', monospace`
+- Size: 12px
+- Line height: 1.4
 
 ---
 
@@ -510,9 +579,7 @@ An animated, AI-branded empty state that feels futuristic and actionable.
 
     {/* Text content */}
     <div className="flex flex-col items-center gap-2 text-center">
-      <p className="text-sm font-medium text-muted-foreground">
-        No file open
-      </p>
+      <p className="text-sm font-medium text-muted-foreground">No file open</p>
       <p className="text-xs text-muted-foreground/70">
         Select a file from the explorer or press{" "}
         <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono">
