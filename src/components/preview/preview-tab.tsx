@@ -1,30 +1,36 @@
 import { cn } from "@/lib/utils";
 import {
+  AlertTriangleIcon,
   ExternalLinkIcon,
-  MonitorIcon,
+  Loader2Icon,
   RefreshCwIcon,
-  SmartphoneIcon,
-  TabletIcon,
+  TerminalSquareIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import { useProject } from "@/hooks/use-projects";
+import { Id } from "../../../convex/_generated/dataModel";
+import { useWebContainer } from "@/hooks/use-webcontainers";
+import { PreviewSettingsPopover } from "./preview-settings";
+import { Allotment } from "allotment";
+import { PreviewTerminal } from "./preview-terminal";
 
-type PreviewDevice = "desktop" | "tablet" | "mobile";
+export default function PreviewTabContent({
+  projectId,
+}: {
+  projectId: Id<"projects">;
+}) {
+  const project = useProject(projectId);
+  const [showTerminal, setShowTerminal] = useState(true);
 
-export default function PreviewTabContent() {
-  const [device, setDevice] = useState<PreviewDevice>("desktop");
-  const [isLoading, setIsLoading] = useState(false);
+  const { status, previewUrl, error, restart, terminalOutput } =
+    useWebContainer({
+      projectId,
+      enabled: true,
+      settings: project?.settings,
+    });
 
-  const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 500);
-  };
-
-  const deviceWidths: Record<PreviewDevice, string> = {
-    desktop: "100%",
-    tablet: "768px",
-    mobile: "375px",
-  };
+  const isLoading = status === "booting" || status === "installing";
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -34,90 +40,98 @@ export default function PreviewTabContent() {
           {/* URL Bar */}
           <div className="flex items-center gap-2 px-3 py-1.5 bg-background border border-border rounded-md min-w-64">
             <div className="size-2 rounded-full bg-success" />
-            <span className="text-xs text-muted-foreground font-mono">
-              localhost:3000
-            </span>
+            {isLoading && (
+              <div className="flex items-center gap-1.5">
+                <Loader2Icon className="size-3 animate-spin" />
+                {status === "booting" ? "Starting..." : "Installing..."}
+              </div>
+            )}
+            {previewUrl && (
+              <span className="text-xs text-muted-foreground font-mono">
+                {previewUrl}
+              </span>
+            )}
+            {!isLoading && !previewUrl && !error && (
+              <span>Ready to preview</span>
+            )}
           </div>
-          {/* Refresh */}
           <Button
             variant="ghost"
             size="sm"
             className="size-8 p-0"
-            onClick={handleRefresh}
+            disabled={isLoading}
+            onClick={restart}
+            title="Restart The Container"
           >
             <RefreshCwIcon
               className={cn("size-4", isLoading && "animate-spin")}
             />
           </Button>
-          {/* Open External */}
           <Button variant="ghost" size="sm" className="size-8 p-0">
             <ExternalLinkIcon className="size-4" />
           </Button>
-        </div>
-
-        {/* Device Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
-          <button
-            onClick={() => setDevice("desktop")}
-            className={cn(
-              "p-1.5 rounded-md transition-colors",
-              device === "desktop"
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground",
-            )}
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-full rounded-none"
+            title="Toggle terminal"
+            onClick={() => setShowTerminal((value) => !value)}
           >
-            <MonitorIcon className="size-4" />
-          </button>
-          <button
-            onClick={() => setDevice("tablet")}
-            className={cn(
-              "p-1.5 rounded-md transition-colors",
-              device === "tablet"
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <TabletIcon className="size-4" />
-          </button>
-          <button
-            onClick={() => setDevice("mobile")}
-            className={cn(
-              "p-1.5 rounded-md transition-colors",
-              device === "mobile"
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <SmartphoneIcon className="size-4" />
-          </button>
+            <TerminalSquareIcon className="size-4" />
+          </Button>
+          <PreviewSettingsPopover
+            projectId={projectId}
+            initialValues={project?.settings}
+            onSave={restart}
+          />
         </div>
       </div>
+      <div className="flex-1 min-h-0">
+        <Allotment vertical>
+          <Allotment.Pane>
+            {error && (
+              <div className="size-full flex items-center justify-center text-muted-foreground">
+                <div className="flex flex-col items-center gap-2 max-w-md mx-auto text-center">
+                  <AlertTriangleIcon className="size-6" />
+                  <p className="text-sm font-medium">{error}</p>
+                  <Button size="sm" variant="outline" onClick={restart}>
+                    <RefreshCwIcon className="size-4" />
+                    Restart
+                  </Button>
+                </div>
+              </div>
+            )}
 
-      {/* Preview Frame */}
-      <div className="flex-1 flex items-start justify-center p-4 bg-muted/20 overflow-auto">
-        <div
-          className={cn(
-            "bg-card rounded-lg shadow-lg overflow-hidden transition-all duration-300",
-            device !== "desktop" && "border border-border",
+            {isLoading && !error && (
+              <div className="size-full flex items-center justify-center text-muted-foreground">
+                <div className="flex flex-col items-center gap-2 max-w-md mx-auto text-center">
+                  <Loader2Icon className="size-6 animate-spin" />
+                  <p className="text-sm font-medium">Installing...</p>
+                </div>
+              </div>
+            )}
+
+            {previewUrl && (
+              <iframe
+                src={previewUrl}
+                className="size-full border-0"
+                title="Preview"
+              />
+            )}
+          </Allotment.Pane>
+
+          {showTerminal && (
+            <Allotment.Pane minSize={100} maxSize={500} preferredSize={200}>
+              <div className="h-full flex flex-col bg-background border-t">
+                <div className="h-7 flex items-center px-3 text-xs gap-1.5 text-muted-foreground border-b border-border/50 shrink-0">
+                  <TerminalSquareIcon className="size-3" />
+                  Terminal
+                </div>
+                <PreviewTerminal output={terminalOutput} />
+              </div>
+            </Allotment.Pane>
           )}
-          style={{
-            width: deviceWidths[device],
-            height: device === "desktop" ? "100%" : "auto",
-            minHeight: device !== "desktop" ? "600px" : undefined,
-            maxWidth: "100%",
-          }}
-        >
-          {/* Mock Preview Content */}
-          <div className="p-8 text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">
-              Hello, Axiom!
-            </h1>
-            <p className="text-muted-foreground mb-4">Count: 0</p>
-            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-              Increment
-            </button>
-          </div>
-        </div>
+        </Allotment>
       </div>
     </div>
   );

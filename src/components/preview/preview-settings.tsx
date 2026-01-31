@@ -74,7 +74,7 @@ export const PreviewSettingsPopover = ({
           className="h-full rounded-none"
           title="Preview settings"
         >
-          <SettingsIcon className="size-3" />
+          <SettingsIcon className="size-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80" align="end">

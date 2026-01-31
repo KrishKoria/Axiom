@@ -95,8 +95,6 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
           {isActiveFileBinary && activeFile && (
             <BinaryFilePreview filename={activeFile.name} url={fileUrl} />
           )}
-
-          {/* Add Terminal */}
         </div>
       </Allotment.Pane>
     </Allotment>
@@ -165,7 +163,7 @@ export function CodePanel({ projectId }: CodePanelProps) {
         {activeTab === "code" ? (
           <CodeTabContent projectId={projectId} />
         ) : (
-          <PreviewTabContent />
+          <PreviewTabContent projectId={projectId} />
         )}
       </div>
     </div>
