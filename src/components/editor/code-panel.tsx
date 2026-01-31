@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FileTreeSidebar } from "../explorer/file-explorer";
 import { Id } from "../../../convex/_generated/dataModel";
-import PreviewTabContent from "./preview-tab";
+import PreviewTabContent from "../preview/preview-tab";
 import EditorTabs from "./editor-tabs";
 import { useEditor } from "@/hooks/use-editor";
 import { FileBreadCrumbs } from "./file-bread-crumbs";
@@ -95,6 +95,8 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
           {isActiveFileBinary && activeFile && (
             <BinaryFilePreview filename={activeFile.name} url={fileUrl} />
           )}
+
+          {/* Add Terminal */}
         </div>
       </Allotment.Pane>
     </Allotment>
