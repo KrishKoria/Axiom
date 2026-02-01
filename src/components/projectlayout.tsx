@@ -14,7 +14,6 @@ const DEFAULT_CONVERSATION_SIDEBAR_WIDTH = 300;
 const DEFAULT_MAIN_SIZE = 1000;
 
 export const ProjectLayout = ({
-  children,
   projectId,
 }: {
   children: React.ReactNode;

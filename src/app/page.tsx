@@ -1,4 +1,4 @@
-import ProjectView from "@/components/views/projects/project-view";
+import ProjectView from "@/components/projects/project-view";
 
 export default function Home() {
   return <ProjectView />;

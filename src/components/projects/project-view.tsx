@@ -15,10 +15,11 @@ import { ActionCard, KeyboardShortcut } from "./action-card";
 import { useCreateProject, useProjectsPartial } from "@/hooks/use-projects";
 import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
-import { Doc } from "../../../../convex/_generated/dataModel";
+import { Doc } from "../../../convex/_generated/dataModel";
 import ProjectsDialog from "./projects-dialog";
 import Image from "next/image";
-import Logo from "../../../../public/logo.svg";
+import Logo from "../../../public/logo.svg";
+import { ImportGithubDialog } from "./import-github-dialog";
 
 export function getProjectIcon(project: Doc<"projects">) {
   if (project.importStatus === "completed") {
@@ -82,7 +83,7 @@ export default function ProjectView() {
   const projects = useProjectsPartial(6);
   const createProject = useCreateProject();
   const [commandDialogOpen, setCommandDialogOpen] = useState(false);
-  // Sort projects by updatedAt (most recent first)
+  const [openImportDialog, setOpenImportDialog] = useState(false);
   const sortedProjects = projects
     ? [...projects].sort((a, b) => b.updatedAt - a.updatedAt)
     : [];
@@ -90,7 +91,6 @@ export default function ProjectView() {
   const featuredProject = sortedProjects[0];
   const recentProjects = sortedProjects.slice(1, 6);
 
-  // Keyboard shortcut handlers
   const handleNew = useCallback(() => {
     createProject({
       name: generateName(),
@@ -98,7 +98,7 @@ export default function ProjectView() {
   }, [createProject]);
 
   const handleImport = useCallback(() => {
-    // TODO: Implement import action
+    setOpenImportDialog(true);
   }, []);
 
   const handleViewAll = useCallback(() => {
@@ -132,6 +132,10 @@ export default function ProjectView() {
       <ProjectsDialog
         open={commandDialogOpen}
         onOpenChange={setCommandDialogOpen}
+      />
+      <ImportGithubDialog
+        open={openImportDialog}
+        onOpenChange={setOpenImportDialog}
       />
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="w-full max-w-2xl space-y-10">

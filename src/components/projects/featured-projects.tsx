@@ -1,6 +1,6 @@
 import { cn, getTimeAgo } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
-import { Doc } from "../../../../convex/_generated/dataModel";
+import { Doc } from "../../../convex/_generated/dataModel";
 import { getProjectIcon } from "./project-view";
 import Link from "next/link";
 

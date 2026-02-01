@@ -14,6 +14,7 @@ import { FileBreadCrumbs } from "./file-bread-crumbs";
 import { useFile, useUpdateFileContent, useFileUrl } from "@/hooks/use-files";
 import CodeEditor from "./code-editor";
 import { BinaryFilePreview } from "./binary-file-preview";
+import { ExportPopover } from "../projects/export-to-github";
 
 const MIN_FILE_TREE_WIDTH = 160;
 const MAX_FILE_TREE_WIDTH = 400;
@@ -104,9 +105,11 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
 function PanelTabs({
   activeTab,
   onTabChange,
+  projectId,
 }: {
   activeTab: PanelTab;
   onTabChange: (tab: PanelTab) => void;
+  projectId: Id<"projects">;
 }) {
   return (
     <div className="shrink-0 flex items-center border-b border-border bg-sidebar">
@@ -139,16 +142,7 @@ function PanelTabs({
         </Button>
       </div>
       <div className="flex-1" />
-      <div className="px-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2 text-xs"
-        >
-          <GithubIcon className="size-3.5" />
-          Export
-        </Button>
-      </div>
+      <ExportPopover projectId={projectId} />
     </div>
   );
 }
@@ -158,7 +152,11 @@ export function CodePanel({ projectId }: CodePanelProps) {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <PanelTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <PanelTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        projectId={projectId}
+      />
       <div className="flex-1 min-h-0">
         {activeTab === "code" ? (
           <CodeTabContent projectId={projectId} />

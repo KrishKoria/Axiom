@@ -6,9 +6,9 @@ import {
   ItemDescription,
   ItemMedia,
   ItemTitle,
-} from "../../ui/item";
+} from "@/components/ui/item";
 import { SignInButton } from "@clerk/nextjs";
-import { Button } from "../../ui/button";
+import { Button } from "../ui/button";
 
 export default function UnAuthenticatedView() {
   return (
