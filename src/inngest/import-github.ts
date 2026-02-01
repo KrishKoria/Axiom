@@ -113,25 +113,106 @@ export const importGithubRepo = inngest.createFunction(
       (item) => item.type === "blob" && item.path && item.sha,
     );
 
-    await step.run("import-files", async () => {
-      for (const file of allFiles) {
-        if (!file.path || !file.sha) {
-          continue;
-        }
-        try {
-          const { data: blob } = await octokit.rest.git.getBlob({
-            owner,
-            repo,
-            file_sha: file.sha,
-          });
-          const buffer = Buffer.from(blob.content, "base64");
-          const isBinary = await isBinaryFile(buffer);
-          const pathParts = file.path.split("/");
-          const name = pathParts.pop()!;
-          const parentPath = pathParts.join("/");
-          const parentId = parentPath ? folderIdMap[parentPath] : undefined;
+    // Helper function to split array into chunks
+    function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+      const chunks: T[][] = [];
+      for (let i = 0; i < array.length; i += chunkSize) {
+        chunks.push(array.slice(i, i + chunkSize));
+      }
+      return chunks;
+    }
 
-          if (isBinary) {
+    await step.run("import-files", async () => {
+      const CHUNK_SIZE = 10; // Process 10 files in parallel at a time
+      const chunks = chunkArray(allFiles, CHUNK_SIZE);
+
+      for (const chunk of chunks) {
+        // Fetch all blobs in this chunk in parallel
+        const blobResults = await Promise.allSettled(
+          chunk.map(async (file) => {
+            if (!file.path || !file.sha) {
+              throw new Error("Missing path or sha");
+            }
+            const { data: blob } = await octokit.rest.git.getBlob({
+              owner,
+              repo,
+              file_sha: file.sha,
+            });
+            return { file, blob };
+          }),
+        );
+
+        // Separate text and binary files
+        const textFiles: Array<{
+          name: string;
+          content: string;
+          parentId?: Id<"files">;
+        }> = [];
+        const binaryFiles: Array<{
+          file: (typeof allFiles)[number];
+          buffer: Buffer;
+          name: string;
+          parentId?: Id<"files">;
+        }> = [];
+
+        for (const result of blobResults) {
+          if (result.status === "rejected") {
+            console.error("Failed to fetch blob:", result.reason);
+            continue;
+          }
+
+          const { file, blob } = result.value;
+          if (!file.path) continue;
+
+          try {
+            const buffer = Buffer.from(blob.content, "base64");
+            const isBinary = await isBinaryFile(buffer);
+            const pathParts = file.path.split("/");
+            const name = pathParts.pop()!;
+            const parentPath = pathParts.join("/");
+            const parentId = parentPath ? folderIdMap[parentPath] : undefined;
+
+            if (isBinary) {
+              binaryFiles.push({ file, buffer, name, parentId });
+            } else {
+              const content = buffer.toString("utf-8");
+              textFiles.push({ name, content, parentId });
+            }
+          } catch (error) {
+            console.error(`Failed to process file ${file.path}:`, error);
+          }
+        }
+
+        // Batch create text files using createFiles mutation
+        if (textFiles.length > 0) {
+          // Group text files by parentId for batch insertion
+          const filesByParent = textFiles.reduce(
+            (acc, file) => {
+              const key = file.parentId ?? "root";
+              if (!acc[key]) acc[key] = [];
+              acc[key].push({ name: file.name, content: file.content });
+              return acc;
+            },
+            {} as Record<string, Array<{ name: string; content: string }>>,
+          );
+
+          // Create all text files in parallel batches by parent
+          await Promise.allSettled(
+            Object.entries(filesByParent).map(([parentKey, files]) =>
+              convex.mutation(api.system.createFiles, {
+                internalKey,
+                projectId,
+                parentId:
+                  parentKey === "root" ? undefined : (parentKey as Id<"files">),
+                files,
+              }),
+            ),
+          );
+        }
+
+        // Process binary files sequentially (they need upload URLs)
+        for (const { buffer, name, parentId } of binaryFiles) {
+          try {
             const uploadUrl = await convex.mutation(
               api.system.generateUploadUrl,
               { internalKey },
@@ -139,7 +220,7 @@ export const importGithubRepo = inngest.createFunction(
             const { storageId } = await ky
               .post(uploadUrl, {
                 headers: { "Content-Type": "application/octet-stream" },
-                body: buffer,
+                body: new Uint8Array(buffer),
               })
               .json<{ storageId: Id<"_storage"> }>();
 
@@ -150,19 +231,9 @@ export const importGithubRepo = inngest.createFunction(
               storageId,
               parentId,
             });
-          } else {
-            const content = buffer.toString("utf-8");
-
-            await convex.mutation(api.system.createFile, {
-              internalKey,
-              projectId,
-              name,
-              content,
-              parentId,
-            });
+          } catch (error) {
+            console.error(`Failed to upload binary file ${name}:`, error);
           }
-        } catch {
-          console.error(`Failed to import file: ${file.path}`);
         }
       }
     });

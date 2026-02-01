@@ -135,47 +135,65 @@ export const exportToGithub = inngest.createFunction(
     }
 
     const treeItems = await step.run("create-blobs", async () => {
-      const items: {
+      // Helper to chunk array for batched processing
+      const chunk = <T,>(arr: T[], size: number): T[][] =>
+        Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+          arr.slice(i * size, (i + 1) * size),
+        );
+
+      const BATCH_SIZE = 5;
+      const batches = chunk(fileEntries, BATCH_SIZE);
+      const allItems: {
         path: string;
         mode: "100644";
         type: "blob";
         sha: string;
       }[] = [];
 
-      for (const [path, file] of fileEntries) {
-        let content: string;
-        let encoding: "utf-8" | "base64" = "utf-8";
+      for (const batch of batches) {
+        const batchResults = await Promise.all(
+          batch.map(async ([path, file]) => {
+            let content: string;
+            let encoding: "utf-8" | "base64" = "utf-8";
 
-        if (file.content !== undefined) {
-          // Text file
-          content = file.content;
-        } else if (file.storageUrl) {
-          // Binary file - fetch and base64 encode
-          const response = await ky.get(file.storageUrl);
-          const buffer = Buffer.from(await response.arrayBuffer());
-          content = buffer.toString("base64");
-          encoding = "base64";
-        } else {
-          // Skip files with no content
-          continue;
-        }
+            if (file.content !== undefined) {
+              // Text file
+              content = file.content;
+            } else if (file.storageUrl) {
+              // Binary file - fetch and base64 encode
+              const response = await ky.get(file.storageUrl);
+              const buffer = Buffer.from(await response.arrayBuffer());
+              content = buffer.toString("base64");
+              encoding = "base64";
+            } else {
+              // Skip files with no content
+              return null;
+            }
 
-        const { data: blob } = await octokit.rest.git.createBlob({
-          owner: user.login,
-          repo: repoName,
-          content,
-          encoding,
-        });
+            const { data: blob } = await octokit.rest.git.createBlob({
+              owner: user.login,
+              repo: repoName,
+              content,
+              encoding,
+            });
 
-        items.push({
-          path,
-          mode: "100644",
-          type: "blob",
-          sha: blob.sha,
-        });
+            return {
+              path,
+              mode: "100644" as const,
+              type: "blob" as const,
+              sha: blob.sha,
+            };
+          }),
+        );
+
+        allItems.push(
+          ...batchResults.filter(
+            (item): item is NonNullable<typeof item> => item !== null,
+          ),
+        );
       }
 
-      return items;
+      return allItems;
     });
 
     if (treeItems.length === 0) {

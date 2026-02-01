@@ -3,6 +3,39 @@ import { mutation, query } from "./_generated/server";
 import verifyAuth from "./auth";
 import { Doc, Id } from "./_generated/dataModel";
 
+// Helper function to collect all descendant IDs (including the root)
+function collectDescendantIds(
+  allFiles: Doc<"files">[],
+  rootId: Id<"files">
+): Id<"files">[] {
+  const childrenMap = new Map<Id<"files"> | undefined, Doc<"files">[]>();
+
+  // Build map for O(1) lookup of children by parent ID
+  for (const file of allFiles) {
+    const parentId = file.parentId;
+    if (!childrenMap.has(parentId)) {
+      childrenMap.set(parentId, []);
+    }
+    childrenMap.get(parentId)!.push(file);
+  }
+
+  // Collect all descendant IDs using BFS
+  const idsToDelete: Id<"files">[] = [];
+  const queue: Id<"files">[] = [rootId];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    idsToDelete.push(currentId);
+
+    const children = childrenMap.get(currentId) || [];
+    for (const child of children) {
+      queue.push(child._id);
+    }
+  }
+
+  return idsToDelete;
+}
+
 export const getFiles = query({
   args: {
     projectId: v.id("projects"),
@@ -95,16 +128,25 @@ export const getFilePath = query({
     if (project.ownerId !== identity.subject) {
       throw new Error("Unauthorized access");
     }
+
+    // Fetch all files for the project in ONE query
+    const allFiles = await ctx.db
+      .query("files")
+      .withIndex("byProject", (q) => q.eq("projectId", file.projectId))
+      .collect();
+
+    // Build a map for O(1) parent lookup
+    const fileMap = new Map(allFiles.map(f => [f._id, f]));
+
+    // Walk up the parent chain in memory
     const path: { _id: string; name: string }[] = [];
-    let currentId: Id<"files"> | undefined = args.fileId;
-    while (currentId) {
-      const currentFile = (await ctx.db.get("files", currentId)) as
-        | Doc<"files">
-        | undefined;
-      if (!currentFile) break;
-      path.unshift({ _id: currentFile._id, name: currentFile.name });
-      currentId = currentFile.parentId;
+    let current: typeof file | undefined = file;
+
+    while (current) {
+      path.unshift({ _id: current._id, name: current.name });
+      current = current.parentId ? fileMap.get(current.parentId) : undefined;
     }
+
     return path;
   },
 });
@@ -278,28 +320,24 @@ export const deleteFile = mutation({
       throw new Error("Unauthorized access");
     }
 
-    // recursively delete all child files/folders if folder
-    async function deleteRecursively(fileId: Id<"files">) {
-      const item = await ctx.db.get("files", fileId);
-      if (!item) return;
-      if (item.type === "folder") {
-        const children = await ctx.db
-          .query("files")
-          .withIndex("byProjectParent", (q) =>
-            q.eq("projectId", item.projectId).eq("parentId", fileId),
-          )
-          .collect();
-        for (const child of children) {
-          await deleteRecursively(child._id);
-        }
-      }
-      if (item.storageId) {
+    // Fetch all files for the project in ONE query
+    const allFiles = await ctx.db
+      .query("files")
+      .withIndex("byProject", (q) => q.eq("projectId", file.projectId))
+      .collect();
+
+    // Collect all IDs to delete in memory
+    const idsToDelete = collectDescendantIds(allFiles, args.fileId);
+
+    // Delete all files (storage first, then DB records)
+    for (const id of idsToDelete) {
+      const item = allFiles.find((f) => f._id === id);
+      if (item?.storageId) {
         await ctx.storage.delete(item.storageId);
       }
-      await ctx.db.delete("files", fileId);
+      await ctx.db.delete("files", id);
     }
 
-    await deleteRecursively(args.fileId);
     await ctx.db.patch("projects", file.projectId, {
       updatedAt: Date.now(),
     });

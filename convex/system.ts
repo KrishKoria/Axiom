@@ -1,6 +1,40 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { Doc, Id } from "./_generated/dataModel";
+
+// Helper function to collect all descendant IDs (including the root)
+function collectDescendantIds(
+  allFiles: Doc<"files">[],
+  rootId: Id<"files">
+): Id<"files">[] {
+  const childrenMap = new Map<Id<"files"> | undefined, Doc<"files">[]>();
+
+  // Build map for O(1) lookup of children by parent ID
+  for (const file of allFiles) {
+    const parentId = file.parentId;
+    if (!childrenMap.has(parentId)) {
+      childrenMap.set(parentId, []);
+    }
+    childrenMap.get(parentId)!.push(file);
+  }
+
+  // Collect all descendant IDs using BFS
+  const idsToDelete: Id<"files">[] = [];
+  const queue: Id<"files">[] = [rootId];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    idsToDelete.push(currentId);
+
+    const children = childrenMap.get(currentId) || [];
+    for (const child of children) {
+      queue.push(child._id);
+    }
+  }
+
+  return idsToDelete;
+}
 
 const validateInternalKey = (key: string) => {
   const internalKey = process.env.CONVEX_INTERNAL_KEY;
@@ -120,16 +154,19 @@ export const getRecentMessages = query({
   handler: async (ctx, args) => {
     validateInternalKey(args.internalKey);
 
+    const limit = args.limit ?? 10;
+
+    // Query in descending order and take only what we need
     const messages = await ctx.db
       .query("messages")
       .withIndex("byConversation", (q) =>
         q.eq("conversationId", args.conversationId),
       )
-      .order("asc")
-      .collect();
+      .order("desc")
+      .take(limit);
 
-    const limit = args.limit ?? 10;
-    return messages.slice(-limit);
+    // Reverse to return in chronological order (asc)
+    return messages.reverse();
   },
 });
 
@@ -384,34 +421,23 @@ export const deleteFile = mutation({
       throw new Error("File not found");
     }
 
-    const deleteRecursive = async (fileId: typeof args.fileId) => {
-      const item = await ctx.db.get(fileId);
+    // Fetch all files for the project in ONE query
+    const allFiles = await ctx.db
+      .query("files")
+      .withIndex("byProject", (q) => q.eq("projectId", file.projectId))
+      .collect();
 
-      if (!item) {
-        return;
-      }
+    // Collect all IDs to delete in memory
+    const idsToDelete = collectDescendantIds(allFiles, args.fileId);
 
-      if (item.type === "folder") {
-        const children = await ctx.db
-          .query("files")
-          .withIndex("byProjectParent", (q) =>
-            q.eq("projectId", item.projectId).eq("parentId", fileId),
-          )
-          .collect();
-
-        for (const child of children) {
-          await deleteRecursive(child._id);
-        }
-      }
-
-      if (item.storageId) {
+    // Delete all files (storage first, then DB records)
+    for (const id of idsToDelete) {
+      const item = allFiles.find((f) => f._id === id);
+      if (item?.storageId) {
         await ctx.storage.delete(item.storageId);
       }
-
-      await ctx.db.delete(fileId);
-    };
-
-    await deleteRecursive(args.fileId);
+      await ctx.db.delete("files", id);
+    }
 
     return args.fileId;
   },
