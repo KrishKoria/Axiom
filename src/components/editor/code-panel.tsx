@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Allotment } from "allotment";
-import { CodeIcon, PlayIcon, GithubIcon, SparklesIcon } from "lucide-react";
+import { CodeIcon, PlayIcon, SparklesIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FileTreeSidebar } from "../explorer/file-explorer";
@@ -75,6 +75,8 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
                 }, 500);
               }}
             />
+          ) : isActiveFileBinary && activeFile ? (
+            <BinaryFilePreview filename={activeFile.name} url={fileUrl} />
           ) : (
             <div className="flex items-center justify-center size-full">
               <div className="flex flex-col items-center gap-6 max-w-sm px-6">
@@ -92,9 +94,6 @@ function CodeTabContent({ projectId }: { projectId: Id<"projects"> }) {
                 </div>
               </div>
             </div>
-          )}
-          {isActiveFileBinary && activeFile && (
-            <BinaryFilePreview filename={activeFile.name} url={fileUrl} />
           )}
         </div>
       </Allotment.Pane>
