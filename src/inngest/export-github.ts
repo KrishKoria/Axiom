@@ -72,7 +72,7 @@ export const exportToGithub = inngest.createFunction(
     const { data: repo } = await step.run("create-repo", async () => {
       return await octokit.rest.repos.createForAuthenticatedUser({
         name: repoName,
-        description: description || `Exported from Polaris`,
+        description: description || `Exported from Axiom`,
         private: visibility === "private",
         auto_init: true,
       });
@@ -136,7 +136,7 @@ export const exportToGithub = inngest.createFunction(
 
     const treeItems = await step.run("create-blobs", async () => {
       // Helper to chunk array for batched processing
-      const chunk = <T,>(arr: T[], size: number): T[][] =>
+      const chunk = <T>(arr: T[], size: number): T[][] =>
         Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
           arr.slice(i * size, (i + 1) * size),
         );
