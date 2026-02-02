@@ -235,6 +235,30 @@
   }
 }
 
+/* Shiki dual theme support - switch to dark theme colors in dark mode */
+/* Streamdown uses data-streamdown="code-block" not .shiki class */
+/* Uses :is(.dark) to match the custom-variant dark definition */
+:is(.dark) [data-streamdown="code-block"] pre,
+:is(.dark) [data-streamdown="code-block"] pre code,
+:is(.dark) [data-streamdown="code-block"] pre code span,
+:is(.dark) [data-streamdown="code-block"] pre code span span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/* Also support .shiki class for any other Shiki usage */
+:is(.dark) .shiki,
+:is(.dark) .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
 ::-webkit-scrollbar {
   @apply w-2.5 h-2.5;
 }
