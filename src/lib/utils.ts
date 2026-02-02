@@ -33,6 +33,7 @@ export function generateName() {
     dictionaries: [adjectives, colors, animals],
     separator: "-",
     style: "lowerCase",
+    length: 3,
   });
 }
 

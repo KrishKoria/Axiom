@@ -20,6 +20,7 @@ import ProjectsDialog from "./projects-dialog";
 import Image from "next/image";
 import Logo from "../../../public/logo.svg";
 import { ImportGithubDialog } from "./import-github-dialog";
+import { NewProjectDialog } from "./new-dialog";
 
 export function getProjectIcon(project: Doc<"projects">) {
   if (project.importStatus === "completed") {
@@ -84,6 +85,7 @@ export default function ProjectView() {
   const createProject = useCreateProject();
   const [commandDialogOpen, setCommandDialogOpen] = useState(false);
   const [openImportDialog, setOpenImportDialog] = useState(false);
+  const [newProjectDialogOpen, setNewProjectDialogOpen] = useState(false);
   const sortedProjects = projects
     ? [...projects].sort((a, b) => b.updatedAt - a.updatedAt)
     : [];
@@ -104,11 +106,12 @@ export default function ProjectView() {
   const handleViewAll = useCallback(() => {
     setCommandDialogOpen(true);
   }, []);
+  const handleNewProjectDialog = useCallback(() => {
+    setNewProjectDialogOpen(true);
+  }, []);
 
-  // Register keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check for Cmd (Mac) or Ctrl (Windows/Linux)
       const modifier = e.metaKey || e.ctrlKey;
 
       if (modifier && e.key.toLowerCase() === "j") {
@@ -120,12 +123,15 @@ export default function ProjectView() {
       } else if (modifier && e.key.toLowerCase() === "k") {
         e.preventDefault();
         handleViewAll();
+      } else if (modifier && e.key.toLowerCase() === "y") {
+        e.preventDefault();
+        handleNewProjectDialog();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleNew, handleImport, handleViewAll]);
+  }, [handleNew, handleImport, handleViewAll, handleNewProjectDialog]);
 
   return (
     <>
@@ -137,6 +143,11 @@ export default function ProjectView() {
         open={openImportDialog}
         onOpenChange={setOpenImportDialog}
       />
+      <NewProjectDialog
+        open={newProjectDialogOpen}
+        onOpenChange={setNewProjectDialogOpen}
+      />
+
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="w-full max-w-2xl space-y-10">
           {/* Logo - centered */}
