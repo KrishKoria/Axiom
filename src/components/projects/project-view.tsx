@@ -6,6 +6,7 @@ import {
   AlertCircleIcon,
   Loader2Icon,
   GlobeIcon,
+  MessageSquarePlus,
 } from "lucide-react";
 import { cn, generateName, getTimeAgo } from "@/lib/utils";
 import { useEffect, useCallback, useState } from "react";
@@ -168,6 +169,12 @@ export default function ProjectView() {
               title="Import"
               shortcut={["cmd", "I"]}
               onClick={handleImport}
+            />
+            <ActionCard
+              icon={MessageSquarePlus}
+              title="Prompt"
+              shortcut={["cmd", "Y"]}
+              onClick={handleNewProjectDialog}
             />
           </div>
 

@@ -212,7 +212,7 @@ export const exportToGithub = inngest.createFunction(
       return await octokit.rest.git.createCommit({
         owner: user.login,
         repo: repoName,
-        message: "Initial commit from Polaris",
+        message: "Initial commit from Axiom",
         tree: tree.sha,
         parents: [initialCommitSha],
       });
