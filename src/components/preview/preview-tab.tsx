@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import {
   AlertTriangleIcon,
@@ -10,13 +12,14 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useState, useCallback, useEffect, MouseEvent } from "react";
 import { useProject } from "@/hooks/use-projects";
 import { Id } from "../../../convex/_generated/dataModel";
 import { useWebContainer } from "@/hooks/use-webcontainers";
 import { PreviewSettingsPopover } from "./preview-settings";
 import { Allotment } from "allotment";
 import { PreviewTerminal } from "./preview-terminal";
+import { useRouter } from "next/navigation";
 import {
   DeviceSwitcher,
   DeviceType,
@@ -28,6 +31,7 @@ export default function PreviewTabContent({
 }: {
   projectId: Id<"projects">;
 }) {
+  const router = useRouter();
   const project = useProject(projectId);
   const [showTerminal, setShowTerminal] = useState(true);
   const [device, setDevice] = useState<DeviceType>("desktop");
@@ -50,11 +54,31 @@ export default function PreviewTabContent({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleOpenExternal = () => {
-    if (previewUrl) {
-      window.open(previewUrl, "_blank");
-    }
-  };
+  const handleOpenExternal = useCallback(
+    (e: MouseEvent) => {
+      // Ctrl/Cmd+click opens in new browser tab
+      if (e.metaKey || e.ctrlKey) {
+        window.open(`/preview/${projectId}`, "_blank");
+      } else {
+        // Normal click navigates in same tab
+        router.push(`/preview/${projectId}`);
+      }
+    },
+    [router, projectId]
+  );
+
+  // Keyboard shortcut for Cmd/Ctrl + Shift + P to open preview
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "P") {
+        e.preventDefault();
+        router.push(`/preview/${projectId}`);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [router, projectId]);
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -123,14 +147,13 @@ export default function PreviewTabContent({
             />
           </Button>
 
-          {/* External Link */}
+          {/* Open Full Preview */}
           <Button
             variant="ghost"
             size="sm"
             className="size-8 p-0"
             onClick={handleOpenExternal}
-            disabled={!previewUrl}
-            title="Open in new tab"
+            title="Open full preview (Ctrl+click for new tab)"
           >
             <ExternalLinkIcon className="size-4" />
           </Button>
